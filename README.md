@@ -151,15 +151,19 @@ Bridging quantitative research into human-centered design and service strategy:
 
 ## 🔬 Methodology & Data Pipeline
 
+* **Encoding & Character Preservation:** Exported datasets use `utf-8-sig` encoding to preserve typography (e.g. en-dashes `–` in categorical ranges like `10–30 minutes`) across standard spreadsheet software (Excel) and programmatic parsers without character corruption.
 * **Sample Qualification:** Filtered from total responses down to **$N = 39$** eligible respondents who both had moved out previously and had usable unwanted household items.
 * **Multiple-Response Parsing:** Survey multi-select fields were tokenized using string splitting and normalized via Pandas `.explode()` methods to compute exact response frequencies without double-counting biases.
 * **Reproducible Scripting:** All visualization parameters, aspect ratios, colorways, and data annotations are fully defined in `notebooks/generate_figures.py`.
 
 ```
-Raw Survey Data (.csv)
+Raw Survey Data (data/survey.csv)
         │
         ▼
-clean_data.ipynb  ──► [Data Cleaning, Type Casting, Missing Value Handling]
+clean_data.ipynb  ──► [Cleaning, Missing Values, UTF-8-SIG Encoding]
+        │
+        ▼
+Cleaned Data (data/cleaned_survey.csv)
         │
         ▼
 Analysis Notebooks (RQ1, RQ2, RQ3)  ──► [Frequency Tables & Hypotheses Testing]
@@ -174,9 +178,12 @@ generate_figures.py  ──► [Publication-ready PNG Visualizations (Figures 2�
 
 ```text
 student-moveout-ux-research/
-├── .gitignore                      # Git exclusion rules (protects raw survey privacy & PDFs)
+├── .gitignore                      # Git exclusion rules (protects school PDFs & virtual environments)
 ├── README.md                       # Comprehensive UX & BA case study (this document)
 ├── Survey_Analysis_Notes.md        # Complete 1,000-line detailed statistical & qualitative notes
+├── data/                           # Anonymized research datasets
+│   ├── survey.csv                  # Raw anonymized survey responses
+│   └── cleaned_survey.csv          # Filtered, preprocessed & UTF-8-SIG encoded dataset
 ├── figures/                        # Exported high-resolution publication figures (300 DPI)
 │   ├── figure_2_fixed.png          # Figure 2: Disposition methods
 │   ├── Figure_3_Modern.png         # Figure 3: First-choice clearing options
@@ -209,7 +216,10 @@ student-moveout-ux-research/
    pip install pandas numpy matplotlib seaborn jupyter
    ```
 
-3. **Re-generate all figures:**
+3. **Run data cleaning (Optional — pre-cleaned data already included):**
+   Open and execute `notebooks/clean_data.ipynb` in Jupyter, or inspect the processed output in `data/cleaned_survey.csv`.
+
+4. **Re-generate all figures:**
    ```bash
    python notebooks/generate_figures.py
    ```
