@@ -1,0 +1,6 @@
+# Ignore raw and cleaned data (protect privacy)
+data/
+
+# Ignore PDFs (School assignments and reports)
+*.pdf
+docs/
