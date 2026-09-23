@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MoveOut M3 — checkpoint revision</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" rel="stylesheet">
+<style>
+/* ================= page chrome ================= */
+:root{ --page:#F1ECE6; --panel:#FFFFFF; --text:#1F2328; --muted:#5E6570; --line:#E2DBD3; --chip:#F3EEE9; --hl:#F8DEA8; --hl-text:#172D52; }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --page:#15171B; --panel:#1F2227; --text:#ECEAE6; --muted:#A6AAB1; --line:#34383E; --chip:#2A2D33; --hl:#4A3F24; --hl-text:#F8DEA8; }
+}
+:root[data-theme="dark"]{ --page:#15171B; --panel:#1F2227; --text:#ECEAE6; --muted:#A6AAB1; --line:#34383E; --chip:#2A2D33; --hl:#4A3F24; --hl-text:#F8DEA8; }
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--text);font-family:Inter,"Helvetica Neue",Arial,sans-serif;font-size:15px;line-height:1.55}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid #49A9B0;outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+.page{max-width:1120px;margin:0 auto;padding:32px 20px 48px}
+.head{display:flex;flex-wrap:wrap;gap:16px 32px;align-items:flex-end;justify-content:space-between;margin-bottom:24px}
+.head h1{font-family:"Bricolage Grotesque",Inter,sans-serif;font-weight:700;font-size:clamp(28px,4vw,40px);line-height:1.05;margin:0 0 10px;letter-spacing:-0.01em}
+.head p{margin:0;max-width:62ch;color:var(--muted)}
+.controls{display:flex;gap:16px;flex-wrap:wrap}
+.cg{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+.seg{display:inline-flex;flex-wrap:wrap;background:var(--chip);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;padding:6px 14px;border-radius:999px;font-size:13px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--panel);color:var(--text);font-weight:500}
+.layout{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:40px;align-items:start}
+@media (max-width:840px){.layout{grid-template-columns:minmax(0,1fr)}.stage{justify-self:center;position:static!important}}
+.stage{position:sticky;top:20px}
+.flow{background:var(--panel);border-radius:20px;padding:22px 22px 12px}
+.flow h2{font-family:"Bricolage Grotesque",Inter,sans-serif;font-size:20px;font-weight:600;margin:0 0 4px}
+.flow h3{font-family:"Bricolage Grotesque",Inter,sans-serif;font-size:17px;font-weight:600;margin:22px 0 6px}
+.flow .sub{margin:0 0 14px;color:var(--muted);font-size:14px}
+.step{display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;padding:12px 10px;border-radius:12px;border:0;background:transparent;width:100%;text-align:left}
+.step:hover{background:var(--chip)}
+.step[aria-current="true"]{background:var(--hl)}
+.step[aria-current="true"] .num{background:var(--hl-text);color:var(--panel)}
+.num{width:28px;height:28px;border-radius:50%;background:var(--chip);display:grid;place-items:center;font-size:13px;font-weight:600}
+.step b{display:block;font-weight:600}
+.step .why{display:block;color:var(--muted);font-size:13.5px;margin-top:2px}
+.reqs{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.req{font-size:11.5px;padding:1px 7px;border-radius:6px;border:1px solid var(--line);color:var(--muted)}
+.flow-foot{border-top:1px solid var(--line);margin-top:10px;padding:12px 10px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.linkbtn{border:0;background:none;padding:0;text-decoration:underline;text-underline-offset:3px;color:var(--text);font-size:13px}
+.roles{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px 14px;font-size:12.5px}
+.role{display:grid;grid-template-columns:28px minmax(0,1fr);gap:8px;align-items:center}
+.role i{width:28px;height:28px;border-radius:8px;border:1px solid var(--line)}
+.role code{font-family:inherit;color:var(--muted);display:block;font-size:11.5px}
+
+/* ================= M3 tokens (Fresh, normal) ================= */
+.phone{
+  --md-sys-color-primary:#174A52; --md-sys-color-on-primary:#FFFFFF;
+  --md-sys-color-primary-container:#D9E2F5; --md-sys-color-on-primary-container:#0E2344;
+  --md-sys-color-secondary-container:#D6E9E5; --md-sys-color-on-secondary-container:#174A52;
+  --md-sys-color-tertiary:#1F686D; --md-sys-color-on-tertiary:#FFFFFF;
+  --md-sys-color-tertiary-container:#DDEEEF; --md-sys-color-on-tertiary-container:#1F686D;
+  --md-sys-color-error:#B23A4E; --md-sys-color-on-error:#FFFFFF;
+  --md-sys-color-surface:#F3F6F3; --md-sys-color-surface-container-lowest:#FFFFFF; --md-sys-color-surface-container-low:#F7F4F0;
+  --md-sys-color-surface-container:#F2EEEA; --md-sys-color-surface-container-high:#E6E1DB; --md-sys-color-surface-container-highest:#DED8D1;
+  --md-sys-color-on-surface:#174A52; --md-sys-color-on-surface-variant:#4E5A6E;
+  --md-sys-color-outline:#7A8290; --md-sys-color-outline-variant:#D6D0C8;
+  --md-sys-color-inverse-surface:#2B3140; --md-sys-color-inverse-on-surface:#F1EDE8;
+  --md-ext-urgency:#E47256; --md-ext-on-urgency:#FFFFFF; --md-ext-urgency-container:#FEE5DE; --md-ext-on-urgency-container:#91402C;
+  --md-ext-collected:#3E7E62; --md-ext-on-collected:#FFFFFF; --md-ext-collected-container:#E2F0E8; --md-ext-on-collected-container:#2E6B50;
+  --app-action-text:var(--md-sys-color-primary); --app-control:var(--md-sys-color-primary); --app-on-control:var(--md-sys-color-on-primary);
+  --app-hero:#FFFFFF; --app-on-hero:#174A52; --app-hero-sub:#4E5A6E; --app-hero-num:#174A52; --app-hero-num-urgent:#B45038;
+  --app-blob-1:#B8DAD5; --app-blob-2:#DFE9C9; --app-room-bedroom:#F4E7DC; --app-room-kitchen:#F6EDD6;
+  width:360px;max-width:100%;height:780px;border-radius:46px;background:#101114;padding:10px;box-shadow:0 30px 60px -30px rgba(20,20,30,.45);
+}
+/* Fresh, emergency (the orange version) */
+.phone.fresh-emg{
+  --app-hero:#FFF0D8; --app-on-hero:#173E48; --app-hero-sub:#6B5130; --app-hero-num-urgent:#9A4A16;
+  --app-blob-1:#F2CD93; --app-blob-2:#B8DAD5;
+  --md-ext-urgency:#B84B2F; --md-ext-urgency-container:#FBE6DE; --md-ext-on-urgency-container:#84341F;
+}
+/* Pastel blocks */
+.phone.pastel, .phone.pastel-emg{
+  --md-sys-color-primary:#141414; --md-sys-color-on-primary:#FFFFFF;
+  --md-sys-color-primary-container:#DDE2FC; --md-sys-color-on-primary-container:#141414;
+  --md-sys-color-secondary-container:#141414; --md-sys-color-on-secondary-container:#FFFFFF;
+  --md-sys-color-tertiary:#2A3570; --md-sys-color-tertiary-container:#D7DCF1; --md-sys-color-on-tertiary-container:#2A3570;
+  --md-sys-color-surface:#F2F1F6; --md-sys-color-surface-container-low:#F8F7FB; --md-sys-color-surface-container:#EDECF2;
+  --md-sys-color-surface-container-high:#E8E7EF; --md-sys-color-surface-container-highest:#DFDEE8;
+  --md-sys-color-on-surface:#141414; --md-sys-color-on-surface-variant:#55545E;
+  --md-sys-color-outline:#85848F; --md-sys-color-outline-variant:#D9D8E0; --md-sys-color-inverse-surface:#2A2A30; --md-sys-color-inverse-on-surface:#F2F1F6;
+  --md-ext-urgency:#C9654D; --md-ext-urgency-container:#F8E0D9; --md-ext-on-urgency-container:#8A3A28;
+  --md-ext-collected:#2F5A52; --md-ext-collected-container:#D8EAE7; --md-ext-on-collected-container:#2F5A52;
+  --app-hero:#BEC8F9; --app-on-hero:#141414; --app-hero-sub:#3D4470; --app-hero-num:#141414; --app-hero-num-urgent:#9E3B28;
+  --app-blob-1:#ECD988; --app-blob-2:#AECFCB; --app-room-bedroom:#EEE1DA; --app-room-kitchen:#F7EFC9;
+}
+.phone.pastel-emg{
+  --md-sys-color-surface:#F6F0EF; --md-sys-color-surface-container-high:#EFE5E3;
+  --md-ext-urgency:#C8412F; --md-ext-urgency-container:#FBE0DA; --md-ext-on-urgency-container:#8E2A1E;
+  --app-hero:#F2B8A8; --app-hero-sub:#6B3328; --app-hero-num-urgent:#8F2F22; --app-blob-1:#E08F7A; --app-blob-2:#ECD988;
+}
+/* Gouache */
+.phone.gouache, .phone.gouache-emg{
+  --md-sys-color-primary:#264654; --md-sys-color-on-primary:#F7F1E6;
+  --md-sys-color-primary-container:#D5E3E8; --md-sys-color-on-primary-container:#1E2F36;
+  --md-sys-color-secondary-container:#DF7E4F; --md-sys-color-on-secondary-container:#1E2F36;
+  --md-sys-color-tertiary:#1F5F56; --md-sys-color-tertiary-container:#DCEBE6; --md-sys-color-on-tertiary-container:#1F5F56;
+  --md-sys-color-surface:#F7F1E6; --md-sys-color-surface-container-lowest:#FFFCF7; --md-sys-color-surface-container-low:#FBF6EE;
+  --md-sys-color-surface-container:#F3ECDF; --md-sys-color-surface-container-high:#EFE6D6; --md-sys-color-surface-container-highest:#E6DBC8;
+  --md-sys-color-on-surface:#264654; --md-sys-color-on-surface-variant:#5B6A6E;
+  --md-sys-color-outline:#7C8582; --md-sys-color-outline-variant:#E3D9C8; --md-sys-color-inverse-surface:#264654; --md-sys-color-inverse-on-surface:#F7F1E6;
+  --md-ext-urgency:#D9534A; --md-ext-urgency-container:#F9DCD8; --md-ext-on-urgency-container:#8E2C25;
+  --md-ext-collected:#3F5E45; --md-ext-collected-container:#E6EDDF; --md-ext-on-collected-container:#3F5E45;
+  --app-hero:#264654; --app-on-hero:#F7F1E6; --app-hero-sub:#E9C46B; --app-hero-num:#F7F1E6; --app-hero-num-urgent:#F4A091;
+  --app-blob-1:#DF7E4F; --app-blob-2:#E9C46B; --app-room-bedroom:#F7E1DB; --app-room-kitchen:#F6EAD3;
+}
+.phone.gouache-emg{
+  --md-sys-color-secondary-container:#264654; --md-sys-color-on-secondary-container:#F7F1E6; --md-sys-color-surface:#F8EFE6;
+  --md-ext-urgency:#C23A30; --md-ext-urgency-container:#F9DAD6;
+  --app-hero:#DF7E4F; --app-on-hero:#1E2F36; --app-hero-sub:#1E2F36; --app-hero-num:#1E2F36; --app-hero-num-urgent:#1E2F36;
+  --app-blob-1:#E9C46B; --app-blob-2:#264654;
+}
+/* Calm */
+.phone.calm, .phone.calm-emg{
+  --md-sys-color-tertiary-container:#DBF0F1; --md-sys-color-surface:#F9F2EF; --md-sys-color-surface-container-high:#EFE6E1;
+  --md-sys-color-on-surface-variant:#4E5A6E; --md-sys-color-outline-variant:#E6DDD6;
+  --md-ext-collected-container:#DFF0E7; --app-blob-1:#F8DEA8; --app-blob-2:#DBF0F1;
+}
+.phone.calm-emg{
+  --md-sys-color-secondary-container:#FECEC2; --md-sys-color-surface:#FAF1EE;
+  --md-ext-urgency:#D9442F; --md-ext-urgency-container:#FDE3DE; --md-ext-on-urgency-container:#9E2A1C;
+  --app-hero:#FEE5DE; --app-hero-num-urgent:#C23A26; --app-blob-1:#F99176; --app-blob-2:#F8DEA8;
+}
+
+/* ================= M3 foundations ================= */
+.screen{
+  --elev-1:0 1px 2px rgba(0,0,0,.3),0 1px 3px 1px rgba(0,0,0,.15);
+  --elev-3:0 1px 3px rgba(0,0,0,.3),0 4px 8px 3px rgba(0,0,0,.15);
+  position:relative;height:100%;border-radius:37px;background:var(--md-sys-color-surface);color:var(--md-sys-color-on-surface);
+  overflow:hidden;display:flex;flex-direction:column;font-family:Inter,Roboto,Arial,sans-serif;
+}
+.brand{font-family:"Bricolage Grotesque",Inter,sans-serif}
+.display-l{font:400 57px/64px "Bricolage Grotesque",Inter,sans-serif;letter-spacing:-0.25px}
+.headline-s{font:500 24px/32px "Bricolage Grotesque",Inter,sans-serif}
+.title-l{font:500 22px/28px "Bricolage Grotesque",Inter,sans-serif}
+.title-m{font:600 16px/24px "Bricolage Grotesque",Inter,sans-serif;letter-spacing:.15px}
+.title-s{font:600 14px/20px "Bricolage Grotesque",Inter,sans-serif;letter-spacing:.1px}
+.body-l{font:400 16px/24px Inter,sans-serif;letter-spacing:.2px}
+.body-m{font:400 14px/20px Inter,sans-serif;letter-spacing:.1px}
+.body-s{font:400 12px/16px Inter,sans-serif;letter-spacing:.2px}
+.label-l{font:500 14px/20px Inter,sans-serif;letter-spacing:.1px}
+.label-m{font:500 12px/16px Inter,sans-serif;letter-spacing:.3px}
+.label-s{font:500 11px/16px Inter,sans-serif;letter-spacing:.3px}
+.var{color:var(--md-sys-color-on-surface-variant)}
+.msym{font-family:"Material Symbols Outlined";font-weight:normal;font-style:normal;font-size:24px;line-height:1;letter-spacing:normal;text-transform:none;display:inline-block;white-space:nowrap;direction:ltr;width:1em;height:1em;overflow:hidden;flex:none;font-variation-settings:"FILL" 0,"wght" 400,"GRAD" 0,"opsz" 24;-webkit-font-smoothing:antialiased}
+.msym.fill{font-variation-settings:"FILL" 1,"wght" 400,"GRAD" 0,"opsz" 24}
+.msym.s18{font-size:18px;font-variation-settings:"FILL" 0,"wght" 400,"GRAD" 0,"opsz" 20}
+.msym.s20{font-size:20px}
+/* state layer */
+.sl{position:relative;overflow:hidden;isolation:isolate}
+.sl::after{content:"";position:absolute;inset:0;background:currentColor;opacity:0;transition:opacity .15s;pointer-events:none;border-radius:inherit}
+.sl:hover::after{opacity:.08}
+.sl:active::after{opacity:.1}
+
+.status{display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;flex:none}
+.body{flex:1;overflow-y:auto;padding:0 16px 24px;scrollbar-width:none}
+.body::-webkit-scrollbar{display:none}
+.appbar{height:64px;display:flex;align-items:center;gap:4px;padding:0 4px;flex:none}
+.appbar .title-l{flex:1;padding-left:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.appbar.home .title-l{padding-left:12px}
+.ib{width:48px;height:48px;border:0;background:transparent;border-radius:50%;display:grid;place-items:center;color:var(--md-sys-color-on-surface-variant);flex:none}
+.ib::after{inset:4px}
+.bottom{flex:none;padding:12px 16px 20px;background:var(--md-sys-color-surface)}
+.err{color:var(--md-sys-color-error);margin:6px 4px 0;min-height:16px}
+
+/* buttons */
+.btn{height:40px;border-radius:20px;padding:0 24px;display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;white-space:nowrap}
+.btn.block{width:100%}
+.btn.filled{background:var(--md-sys-color-primary);color:var(--md-sys-color-on-primary)}
+.btn.tonal{background:var(--md-sys-color-secondary-container);color:var(--md-sys-color-on-secondary-container)}
+.btn.outlined{background:transparent;border:1px solid var(--md-sys-color-outline-variant);color:var(--app-action-text)}
+.btn.text{background:transparent;color:var(--app-action-text);padding:0 12px}
+.btn .msym{font-size:18px}
+.btnrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fab{position:absolute;right:16px;bottom:96px;height:56px;border-radius:16px;padding:0 20px 0 16px;border:0;display:inline-flex;align-items:center;gap:12px;
+  background:var(--md-sys-color-primary);color:var(--md-sys-color-on-primary);box-shadow:var(--elev-3);z-index:3}
+
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{height:32px;border-radius:8px;padding:0 16px;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--md-sys-color-outline-variant);background:transparent;color:var(--md-sys-color-on-surface-variant)}
+.chip[aria-pressed="true"]{background:var(--md-sys-color-secondary-container);color:var(--md-sys-color-on-secondary-container);border-color:transparent;padding-left:8px}
+.chip.input{padding:0 8px 0 12px;color:var(--md-sys-color-on-surface-variant);background:var(--md-sys-color-surface-container-lowest)}
+.chip.input .x{width:24px;height:24px;border-radius:50%;border:0;background:transparent;display:grid;place-items:center;color:inherit;padding:0}
+.chip.assist{padding:0 8px 0 12px;background:var(--md-sys-color-surface-container-lowest);color:var(--md-sys-color-on-surface)}
+.tag{display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:8px;gap:4px;background:var(--md-sys-color-surface-container-high);color:var(--md-sys-color-on-surface-variant)}
+.tag.log{background:var(--md-sys-color-tertiary-container);color:var(--md-sys-color-on-tertiary-container)}
+.tag.done{background:var(--md-ext-collected-container);color:var(--md-ext-on-collected-container)}
+.tag.urg{background:var(--md-ext-urgency-container);color:var(--md-ext-on-urgency-container)}
+.tag.sel{background:var(--md-sys-color-secondary-container);color:var(--md-sys-color-on-secondary-container)}
+
+/* segmented button */
+.segb{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;border:1px solid var(--md-sys-color-outline);border-radius:20px;overflow:hidden;height:40px}
+.segb button{border:0;border-left:1px solid var(--md-sys-color-outline);background:transparent;color:var(--md-sys-color-on-surface);display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 8px}
+.segb button:first-child{border-left:0}
+.segb button[aria-pressed="true"]{background:var(--md-sys-color-secondary-container);color:var(--md-sys-color-on-secondary-container)}
+
+/* cards and lists */
+.card{background:var(--md-sys-color-surface-container-lowest);border-radius:12px}
+.card.pad{padding:16px}
+.card.filled{background:var(--md-sys-color-surface-container-high)}
+.card + .card, .card + .sub-h, .stack > * + *{margin-top:12px}
+.sub-h{padding:16px 4px 8px;display:flex;justify-content:space-between;align-items:center}
+.list{background:var(--md-sys-color-surface-container-lowest);border-radius:12px;overflow:hidden}
+.li{display:flex;align-items:center;gap:16px;min-height:72px;padding:8px 16px;width:100%;border:0;background:transparent;text-align:left;color:var(--md-sys-color-on-surface)}
+.li + .li{border-top:1px solid var(--md-sys-color-outline-variant)}
+.li .txt{flex:1;min-width:0}
+.li .txt .body-l{display:block}
+.li .txt .body-m{display:block;color:var(--md-sys-color-on-surface-variant)}
+.li .lead{width:56px;height:56px;flex:none}
+.li.urg{background:var(--md-ext-urgency-container)}
+.li.urg .body-m{color:var(--md-ext-on-urgency-container)}
+.li.urg + .li.urg{border-top-color:rgba(255,255,255,.7)}
+.li .trail{flex:none;display:flex;align-items:center;gap:4px;color:var(--md-sys-color-on-surface-variant)}
+.circle{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none}
+.avatar{width:40px;height:40px;border-radius:50%;background:var(--md-sys-color-tertiary-container);color:var(--md-sys-color-on-tertiary-container);display:grid;place-items:center;flex:none}
+.divider{height:1px;background:var(--md-sys-color-outline-variant);margin:12px 0}
+
+/* selection controls */
+.cb{width:40px;height:40px;border:0;background:transparent;border-radius:50%;display:grid;place-items:center;padding:0;flex:none;color:var(--md-sys-color-on-surface-variant)}
+.cb span.box{width:18px;height:18px;border-radius:2px;border:2px solid currentColor;display:grid;place-items:center}
+.cb[aria-checked="true"] span.box{background:var(--app-control);border-color:var(--app-control);color:var(--app-on-control)}
+.rb{display:flex;align-items:center;gap:12px;width:100%;border:0;background:transparent;text-align:left;padding:8px 0;color:var(--md-sys-color-on-surface)}
+.rb .dot{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none}
+.rb .dot::before{content:"";width:20px;height:20px;border-radius:50%;box-sizing:border-box;border:2px solid var(--md-sys-color-on-surface-variant)}
+.rb[aria-checked="true"] .dot::before{border:6px solid var(--app-control);box-shadow:inset 0 0 0 1px var(--md-sys-color-surface-container-lowest)}
+.rb .body-m{display:block;color:var(--md-sys-color-on-surface-variant)}
+.field{position:relative;border:1px solid var(--md-sys-color-outline);border-radius:4px;height:56px;display:flex;align-items:center;padding:0 16px}
+.field:focus-within{border:2px solid var(--app-control);padding:0 15px}
+.field label{position:absolute;top:-9px;left:12px;padding:0 4px;background:var(--md-sys-color-surface-container-lowest);color:var(--md-sys-color-on-surface-variant)}
+.field input{border:0;outline:0;background:transparent;width:100%;color:var(--md-sys-color-on-surface);font:400 16px/24px Inter,sans-serif}
+.field .pre{color:var(--md-sys-color-on-surface-variant);margin-right:4px}
+.support{display:flex;gap:8px;align-items:flex-start;color:var(--md-sys-color-on-surface-variant);margin-top:8px}
+
+/* navigation bar */
+.nav{flex:none;height:80px;background:var(--md-sys-color-surface-container);display:grid;grid-template-columns:repeat(4,1fr);padding:12px 0 16px}
+.nav button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--md-sys-color-on-surface-variant)}
+.nav .ind{width:64px;height:32px;border-radius:16px;display:grid;place-items:center;position:relative;overflow:hidden}
+.nav .ind::after{content:"";position:absolute;inset:0;background:currentColor;opacity:0}
+.nav button:hover .ind::after{opacity:.08}
+.nav button[aria-current="true"]{color:var(--md-sys-color-on-surface)}
+.nav button[aria-current="true"] .label-m{font-weight:700}
+.nav button[aria-current="true"] .ind{background:var(--md-sys-color-secondary-container);color:var(--md-sys-color-on-secondary-container)}
+
+/* sheet, snackbar */
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.32);display:flex;align-items:flex-end;z-index:5}
+.sheet{width:100%;background:var(--md-sys-color-surface-container-low);border-radius:28px 28px 0 0;padding:0 16px 24px}
+.handle{width:32px;height:4px;border-radius:2px;background:var(--md-sys-color-outline);opacity:.5;margin:22px auto 18px}
+.snack{position:absolute;left:16px;right:16px;bottom:96px;min-height:48px;border-radius:4px;background:var(--md-sys-color-inverse-surface);color:var(--md-sys-color-inverse-on-surface);box-shadow:var(--elev-3);display:flex;align-items:center;padding:14px 16px;z-index:6}
+.snack.low{bottom:84px}
+
+/* app-specific components */
+.hero{position:relative;overflow:hidden;background:var(--app-hero);color:var(--app-on-hero);border-radius:28px;padding:20px 20px 18px}
+.hero .blob{position:absolute;right:-28px;top:-34px;width:136px;height:136px;border-radius:50%;background:var(--app-blob-1)}
+.hero .blob2{position:absolute;right:48px;top:64px;width:26px;height:26px;border-radius:50%;background:var(--app-blob-2)}
+.hero .display-l{color:var(--app-hero-num)}
+.hero.urgent .display-l{color:var(--app-hero-num-urgent)}
+.hero .sub{color:var(--app-hero-sub)}
+.hero > div{position:relative}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.stat{border-radius:12px;padding:10px 12px;background:var(--md-sys-color-surface-container-lowest)}
+.stat b{display:block;font:600 22px/28px "Bricolage Grotesque",Inter,sans-serif}
+.stat.done{background:var(--md-ext-collected-container);color:var(--md-ext-on-collected-container)}
+.stat.log{background:var(--md-sys-color-tertiary-container);color:var(--md-sys-color-on-tertiary-container)}
+.stat.urg{background:var(--md-ext-urgency-container);color:var(--md-ext-on-urgency-container)}
+.banner{display:flex;gap:16px;align-items:center;border-radius:12px;padding:16px;margin-top:12px}
+.banner.urg{background:var(--md-ext-urgency-container);color:var(--md-sys-color-on-surface)}
+.banner.urg .circle{background:var(--md-ext-urgency);color:var(--md-ext-on-urgency)}
+.banner.done{background:var(--md-ext-collected-container);color:var(--md-ext-on-collected-container)}
+.banner.done .circle{background:var(--md-ext-collected);color:var(--md-ext-on-collected)}
+.banner.log{background:var(--md-sys-color-tertiary-container);color:var(--md-sys-color-on-tertiary-container)}
+.banner.log .circle{background:var(--md-sys-color-tertiary);color:var(--md-sys-color-on-tertiary)}
+.banner.sel{background:var(--md-sys-color-secondary-container);color:var(--md-sys-color-on-secondary-container)}
+.banner.sel .circle{background:var(--md-sys-color-surface-container-lowest);color:var(--md-sys-color-on-surface)}
+.photo{position:relative;border-radius:16px;overflow:hidden;background:#EAD7C4}
+.photo svg{display:block;width:100%;height:auto}
+.hot{cursor:pointer;fill:transparent}
+.hot:hover{fill:rgba(255,255,255,.2)}
+.finder{position:absolute;inset:0;background:rgba(0,0,0,.38);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:12px;gap:8px;color:#fff}
+.corner{position:absolute;width:24px;height:24px;border:3px solid #fff}
+.shutter{width:60px;height:60px;border-radius:50%;border:4px solid #fff;background:rgba(255,255,255,.35)}
+.shutter:hover{background:rgba(255,255,255,.6)}
+.dash{border:1.5px dashed var(--md-sys-color-outline);border-radius:16px;height:150px;display:grid;place-items:center;text-align:center;color:var(--md-sys-color-on-surface-variant);background:transparent;width:100%}
+.track{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.track div{color:var(--md-sys-color-on-surface-variant)}
+.track span{display:block;height:4px;border-radius:2px;background:var(--md-sys-color-surface-container-highest);margin-bottom:8px}
+.track .on{color:var(--md-sys-color-on-surface)} .track .on span{background:var(--md-sys-color-primary)}
+.track .now{color:var(--md-sys-color-on-tertiary-container)} .track .now span{background:transparent;box-shadow:inset 0 0 0 1.5px var(--md-sys-color-tertiary)}
+.bubble{max-width:82%;padding:10px 14px;border-radius:20px;margin-top:8px}
+.bubble.in{background:var(--md-sys-color-surface-container-lowest);border-bottom-left-radius:4px}
+.bubble.out{background:var(--md-sys-color-secondary-container);color:var(--md-sys-color-on-secondary-container);margin-left:auto;border-bottom-right-radius:4px}
+.composer{flex:none;display:flex;gap:8px;align-items:center;padding:8px 12px 20px;background:var(--md-sys-color-surface-container)}
+.composer .pill{flex:1;height:48px;border-radius:24px;background:var(--md-sys-color-surface-container-high);display:flex;align-items:center;padding:0 16px}
+.composer input{border:0;outline:0;background:transparent;width:100%;font:400 16px/24px Inter,sans-serif;color:var(--md-sys-color-on-surface)}
+.thumb{display:block;border-radius:8px}
+.room-select{width:100%;margin:8px 0 16px;padding:12px;border:1px solid var(--md-sys-color-outline);border-radius:8px;background:var(--md-sys-color-surface-container-lowest);color:var(--md-sys-color-on-surface);font:inherit}
+.item-fields{flex-basis:100%;min-width:0;padding:8px 0 12px}
+.edit-summary{flex-basis:100%;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.dimension-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.dimension-grid .field{padding:0 9px}.dimension-grid .field label{left:4px}.dimension-grid input{min-width:0}
+.item-edit{align-items:center}.sheet{max-height:92%;overflow-y:auto}
+@media(max-width:420px){.page{padding:20px 10px}.stage{position:relative;top:0;width:100%}.phone{width:360px;margin:auto}.layout{gap:24px}}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="head">
+    <div>
+      <h1 id="task-title"></h1>
+      <p id="task-text"></p>
+    </div>
+    <div class="controls">
+      <div class="cg">Task
+        <div class="seg" role="group" aria-label="Task">
+          <button data-task="1">Task 1</button><button data-task="2">Task 2</button><button data-task="3">Task 3</button>
+        </div>
+      </div>
+      <div class="cg">Palette
+        <div class="seg" role="group" aria-label="Palette">
+          <button data-palette="fresh">Fresh</button><button data-palette="pastel">Pastel blocks</button><button data-palette="gouache">Gouache</button><button data-palette="calm">Calm</button>
+        </div>
+      </div>
+      <div class="cg">Colour mode
+        <div class="seg" role="group" aria-label="Colour mode">
+          <button data-mode="normal">Normal</button><button data-mode="emergency">Emergency</button>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="layout">
+    <div class="stage"><div class="phone" id="phone"><div class="screen" id="screen"></div></div></div>
+    <aside class="flow" aria-label="Screens in this flow">
+      <h2>Flow and requirement coverage</h2>
+      <p class="sub" id="flow-sub"></p>
+      <div id="steps"></div>
+      <h3>Colour roles in this mode</h3>
+      <p class="sub" style="margin-bottom:10px">Names match Material 3 tokens, so they map straight onto Figma variables. Extended colours use the md-ext prefix; app-specific values use app.</p>
+      <div class="roles" id="roles"></div>
+      <div class="flow-foot">
+        <span>Local demo only; listings and messages are simulated. Restart resets this task.</span>
+        <button class="linkbtn" id="restart">Restart this task</button>
+      </div>
+    </aside>
+  </div>
+</div>
+<script>
+const I = (n, cls = '') => `<span class="msym ${cls}" aria-hidden="true">${n}</span>`;
+
+const ITEMS = {
+  desk:{room:'bedroom',name:'Desk',x:74,y:124,cond:'Good'},
+  chair:{room:'bedroom',name:'Chair',x:118,y:126,cond:'Good'},
+  lamp:{room:'bedroom',name:'Desk lamp',x:44,y:66,cond:'Like new'},
+  plant:{room:'bedroom',name:'Potted plant',x:112,y:86,cond:'Good'},
+  box:{room:'bedroom',name:'Storage box',x:187,y:178,cond:'Good'},
+  dishes:{room:'kitchen',name:'Plates, set of 6',x:60,y:36,cond:'Used'},
+  mugs:{room:'kitchen',name:'Mugs, pair',x:128,y:36,cond:'Good'},
+  pots:{room:'kitchen',name:'Pots and pans',x:58,y:94,cond:'Good'},
+  kettle:{room:'kitchen',name:'Kettle',x:141,y:92,cond:'Like new'},
+  toaster:{room:'kitchen',name:'Toaster',x:228,y:102,cond:'Good'}
+};
+const ROOMS = {bedroom:'Bedroom', living:'Living room', study:'Study', other:'Other'};
+const CONDS = ['Like new','Good','Used'];
+const TIMES = ['Weekday mornings','Weekday evenings','Weekends'];
+const HOTS = {
+  bedroom:[['desk',18,104,76,58],['box',154,150,66,52],['chair',94,98,46,76],['plant',100,72,24,36],['lamp',26,54,36,56]],
+  kitchen:[['dishes',36,36,48,24],['mugs',104,34,52,26],['pots',24,92,70,40],['kettle',114,84,52,48],['toaster',196,100,64,32]]
+};
+const SCENES = {
+bedroom:`
+<rect width="320" height="152" fill="#F4E7DC"/><rect y="150" width="320" height="70" fill="#EAD7C4"/>
+<rect x="182" y="22" width="70" height="58" rx="3" fill="#DBF0F1" stroke="#fff" stroke-width="4"/><path d="M217 22v58M182 51h70" stroke="#fff" stroke-width="3"/>
+<ellipse cx="112" cy="198" rx="78" ry="11" fill="#F8DEA8"/>
+<rect x="210" y="118" width="110" height="36" rx="4" fill="#fff"/><rect x="236" y="112" width="84" height="40" rx="6" fill="#97D4D9"/><rect x="214" y="104" width="30" height="14" rx="6" fill="#fff" stroke="#E6DCD2"/>
+<rect x="214" y="152" width="5" height="12" fill="#B57B4C"/><rect x="312" y="152" width="5" height="12" fill="#B57B4C"/>
+<rect x="20" y="108" width="110" height="8" rx="2" fill="#C98F5E"/><rect x="26" y="116" width="6" height="46" fill="#C98F5E"/><rect x="118" y="116" width="6" height="46" fill="#C98F5E"/><rect x="82" y="116" width="36" height="16" fill="#B57B4C"/><rect x="96" y="122" width="8" height="3" rx="1" fill="#8F5E37"/>
+<path d="M104 94h16l-2 14h-12z" fill="#E47256"/><ellipse cx="107" cy="84" rx="4" ry="11" fill="#60AA88" transform="rotate(-18 107 84)"/><ellipse cx="117" cy="84" rx="4" ry="11" fill="#60AA88" transform="rotate(18 117 84)"/><ellipse cx="112" cy="80" rx="3.5" ry="11" fill="#4D9676"/>
+<ellipse cx="50" cy="106" rx="11" ry="3" fill="#3A3A48"/><path d="M50 106l8-26-12-12" stroke="#3A3A48" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M28 72l18-14 10 14z" fill="#E9BE63"/>
+<rect x="96" y="136" width="42" height="8" rx="2" fill="#60AA88"/><rect x="128" y="98" width="9" height="46" rx="2" fill="#60AA88"/><path d="M100 144v30M134 144v30" stroke="#3E7E62" stroke-width="3"/>
+<rect x="158" y="160" width="58" height="40" fill="#D9A86C"/><rect x="154" y="152" width="66" height="11" rx="2" fill="#C99356"/><rect x="179" y="173" width="16" height="5" rx="2" fill="#B98246"/>`,
+kitchen:`
+<rect width="320" height="132" fill="#F4E7DC"/><rect y="130" width="320" height="90" fill="#EDE0D2"/>
+<rect y="128" width="320" height="10" fill="#C98F5E"/>
+<path d="M60 146v66M160 146v66M260 146v66" stroke="#DCCDBE" stroke-width="2"/><rect x="48" y="170" width="6" height="16" rx="2" fill="#C9B8A6"/><rect x="148" y="170" width="6" height="16" rx="2" fill="#C9B8A6"/><rect x="248" y="170" width="6" height="16" rx="2" fill="#C9B8A6"/>
+<rect x="272" y="14" width="44" height="116" rx="6" fill="#fff" stroke="#E0D6CC"/><path d="M272 58h44" stroke="#E0D6CC"/><rect x="278" y="30" width="3" height="16" rx="1" fill="#C9B8A6"/><rect x="278" y="68" width="3" height="20" rx="1" fill="#C9B8A6"/>
+<rect x="28" y="60" width="176" height="5" rx="2" fill="#C98F5E"/>
+<rect x="40" y="52" width="40" height="5" rx="2.5" fill="#fff" stroke="#CFC5BB"/><rect x="40" y="46" width="40" height="5" rx="2.5" fill="#fff" stroke="#CFC5BB"/><rect x="40" y="40" width="40" height="5" rx="2.5" fill="#fff" stroke="#CFC5BB"/>
+<rect x="108" y="42" width="16" height="18" rx="3" fill="#49A9B0"/><path d="M124 46h3a3 3 0 0 1 0 8h-3" stroke="#49A9B0" stroke-width="2.5" fill="none"/><rect x="134" y="42" width="16" height="18" rx="3" fill="#E9BE63"/><path d="M150 46h3a3 3 0 0 1 0 8h-3" stroke="#E9BE63" stroke-width="2.5" fill="none"/>
+<rect x="170" y="36" width="22" height="24" rx="3" fill="#97D4D9"/>
+<rect x="30" y="100" width="56" height="28" rx="4" fill="#E47256"/><ellipse cx="58" cy="100" rx="30" ry="5" fill="#B45038"/><rect x="54" y="92" width="8" height="6" rx="2" fill="#B45038"/><path d="M30 108h-8M86 108h8" stroke="#B45038" stroke-width="4" stroke-linecap="round"/>
+<path d="M122 128l4-30h30l4 30z" fill="#49A9B0"/><path d="M123 104l-9-8" stroke="#49A9B0" stroke-width="5" stroke-linecap="round"/><path d="M130 98a11 11 0 0 1 22 0" stroke="#2E7F86" stroke-width="3" fill="none"/>
+<rect x="200" y="104" width="56" height="24" rx="9" fill="#DFF0E7" stroke="#60AA88" stroke-width="2"/><path d="M212 110h12M232 110h12" stroke="#3E7E62" stroke-width="3" stroke-linecap="round"/>`
+};
+const THUMB = {
+  desk:'<rect x="8" y="17" width="28" height="4" rx="1" fill="#C98F5E"/><rect x="10" y="21" width="3" height="14" fill="#C98F5E"/><rect x="31" y="21" width="3" height="14" fill="#C98F5E"/><rect x="21" y="21" width="12" height="6" fill="#B57B4C"/>',
+  chair:'<rect x="12" y="24" width="18" height="4" rx="1" fill="#60AA88"/><rect x="26" y="9" width="4" height="19" rx="1" fill="#60AA88"/><path d="M14 28v8M28 28v8" stroke="#3E7E62" stroke-width="2"/>',
+  lamp:'<ellipse cx="17" cy="34" rx="7" ry="2" fill="#3A3A48"/><path d="M17 34l5-14-8-6" stroke="#3A3A48" stroke-width="2" fill="none"/><path d="M6 17l10-8 6 9z" fill="#E9BE63"/>',
+  plant:'<path d="M16 26h12l-2 10h-8z" fill="#E47256"/><ellipse cx="18" cy="18" rx="4" ry="8" fill="#60AA88" transform="rotate(-20 18 18)"/><ellipse cx="26" cy="18" rx="4" ry="8" fill="#60AA88" transform="rotate(20 26 18)"/>',
+  box:'<rect x="10" y="18" width="24" height="17" fill="#D9A86C"/><rect x="8" y="14" width="28" height="6" fill="#C99356"/><rect x="18" y="24" width="8" height="3" rx="1" fill="#B98246"/>',
+  dishes:'<rect x="9" y="27" width="26" height="4" rx="2" fill="#fff" stroke="#CFC5BB"/><rect x="9" y="22" width="26" height="4" rx="2" fill="#fff" stroke="#CFC5BB"/><rect x="9" y="17" width="26" height="4" rx="2" fill="#fff" stroke="#CFC5BB"/>',
+  mugs:'<rect x="8" y="17" width="11" height="14" rx="2" fill="#49A9B0"/><path d="M19 20h2a2 2 0 0 1 0 6h-2" stroke="#49A9B0" stroke-width="2" fill="none"/><rect x="24" y="17" width="11" height="14" rx="2" fill="#E9BE63"/><path d="M35 20h1a2 2 0 0 1 0 6h-1" stroke="#E9BE63" stroke-width="2" fill="none"/>',
+  pots:'<rect x="9" y="19" width="26" height="15" rx="3" fill="#E47256"/><ellipse cx="22" cy="19" rx="14" ry="3" fill="#B45038"/><rect x="20" y="13" width="4" height="4" rx="1" fill="#B45038"/>',
+  kettle:'<path d="M13 34l2-16h14l2 16z" fill="#49A9B0"/><path d="M13 22l-5-4" stroke="#49A9B0" stroke-width="3" stroke-linecap="round"/><path d="M17 18a5 5 0 0 1 10 0" stroke="#2E7F86" stroke-width="2" fill="none"/>',
+  toaster:'<rect x="8" y="18" width="28" height="16" rx="6" fill="#DFF0E7" stroke="#60AA88" stroke-width="1.5"/><path d="M15 22h6M24 22h6" stroke="#3E7E62" stroke-width="2" stroke-linecap="round"/>'
+};
+const MINIMAP = `<svg viewBox="0 0 300 110" width="100%" aria-hidden="true" style="display:block;border-radius:12px"><rect width="300" height="110" fill="#EDE7E0"/><rect x="178" y="0" width="122" height="62" fill="#DCE9D2"/><path d="M0 70h300M120 0v110M0 30h120M200 62v48" stroke="#fff" stroke-width="9"/><path d="M0 70h300" stroke="#fff" stroke-width="14"/><rect x="186" y="8" width="44" height="28" rx="3" fill="#E6D9CB"/><rect x="238" y="12" width="52" height="36" rx="3" fill="#E6D9CB"/><circle cx="178" cy="62" r="16" fill="var(--log-fg)" fill-opacity=".15"/><path d="M178 64s-9-8-9-15a9 9 0 0 1 18 0c0 7-9 15-9 15z" fill="var(--log-fg)"/><circle cx="178" cy="49" r="3.2" fill="#fff"/></svg>`;
+
+const THUMB_GENERIC = '<rect x="11" y="16" width="22" height="18" rx="2" fill="#D9A86C"/><path d="M11 16l11-6 11 6" fill="#C99356"/>';
+function thumb(id, size = 56){
+  const it = ITEMS[id];
+  return `<svg class="thumb" width="${size}" height="${size}" viewBox="0 0 44 44" aria-hidden="true"><rect width="44" height="44" rx="8" fill="var(--app-room-${it.room === 'kitchen' ? 'kitchen' : 'bedroom'})"/>${THUMB[it.art || id] || THUMB_GENERIC}</svg>`;
+}
+
+/* ---------------- data for tasks 2 and 3 ---------------- */
+const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const TRANSPORT = ['Carry by hand','Car needed','Van needed'];
+const SAMPLE_DETAILS = {desk:{l:120,w:60,h:75,transport:'Car needed'},chair:{l:45,w:45,h:85,transport:'Car needed'},lamp:{l:20,w:20,h:40,transport:'Carry by hand'},plant:{l:20,w:20,h:35,transport:'Carry by hand'},box:{l:50,w:35,h:30,transport:'Carry by hand'}};
+for (const room of ['living','study','other']){
+  SCENES[room] = SCENES.bedroom;
+  HOTS[room] = HOTS.bedroom.map(([id,...coords]) => [room+'_'+id,...coords]);
+  for (const source of Object.keys(SAMPLE_DETAILS)) ITEMS[room+'_'+source] = {...ITEMS[source],room,art:source};
+}
+const priceText = id => S.priceModes[id] === 'set' ? (S.prices[id] ? '$'+Number(S.prices[id]).toFixed(2) : 'Price needed') : 'Free';
+const sizeText = id => {const d=S.dimensions[id];return d && d.l && d.w && d.h ? `${d.l} × ${d.w} × ${d.h} cm` : 'Dimensions needed';};
+function itemProblem(){
+  if (!chosen().length) return 'Select at least one item to continue.';
+  for (const id of chosen()){
+    let message=''; const d=S.dimensions[id] || {};
+    if(S.priceModes[id]==='set' && (!/^\d+(\.\d{1,2})?$/.test(S.prices[id] || '') || Number(S.prices[id])<=0)) message=`Add a valid price for ${ITEMS[id].name}, or choose Free.`;
+    else if(!['l','w','h'].every(k=>Number.isFinite(Number(d[k])) && Number(d[k])>0)) message=`Add length, width and height for ${ITEMS[id].name}.`;
+    else if(!S.transport[id]) message=`Choose transport for ${ITEMS[id].name}.`;
+    if(message){S.expanded=id;return message;}
+  }
+  return '';
+}
+const SLOTS = ['Wed 23 Sep, 6 PM','Thu 24 Sep, 6:30 PM','Sat 26 Sep, 11 AM'];
+const T3_ITEMS = [
+  ['desk','log','Taylor collects Mon 2 PM'],
+  ['lamp','log','Jamie collects Tue 10 AM'],
+  ['chair','claimed','Claimed · pickup time not agreed yet'],
+  ['box','risk','No claims in 12 days'],
+  ['plant','risk','Claim cancelled yesterday']
+];
+const OPTS = {
+  donate:{icon:'volunteer_activism', title:'Donate to charity', desc:'Confirm acceptance, then arrange your drop-off', tag:'Charity drop-off', q:'When will you drop it off?', choices:['Mon 28 Sep','Tue 29 Sep']},
+  price:{icon:'sell', title:'Change price or offer it free', desc:'Update the listing to attract a claim', tag:'Price updated', q:'New price (A$)', choices:[]}
+};
+
+const BACKUPS = ['Drop at charity on Tue','Bulky waste pickup on Tue'];
+
+/* ---------------- state ---------------- */
+const fresh = () => ({
+  task:1, screen:'home', sheet:null, snack:'', error:'',
+  room:'bedroom', shot:{bedroom:false,kitchen:false}, tagged:[], selected:new Set(), cond:{}, custom:0,
+  single:{photo:false, name:'', room:'bedroom', cond:'Good'},
+  pickup:'campus', times:new Set(['Weekday evenings','Weekends']), price:'free', prices:{}, priceModes:{}, dimensions:{}, transport:{}, listed:[], filter:'all', where:{}, expanded:null, published:false,
+  slot:null, customSlot:null, place:'home', access:null, help:false, sent:false, confirmed:false, chat:[], typing:false, oday:null, otime:null,
+  plans:{}, t3item:'box', t3opt:null, t3pick:new Set(), backup:null, charityYes:false, newPrice:'', changedPrices:{}
+});
+let S = fresh();
+let PAL = 'fresh', MODE = 'normal';
+
+const chosen = () => S.tagged.filter(id => S.selected.has(id));
+const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+const chev = () => I('chevron_right');
+
+/* ---------------- shared chrome ---------------- */
+function statusBar(){
+  return `<div class="status label-l"><span>9:41</span><span style="display:flex;gap:4px">${I('signal_cellular_alt','s18')}${I('wifi','s18')}${I('battery_full','s18')}</span></div>`;
+}
+function appbar(title, back, icon = 'arrow_back'){
+  return `<div class="appbar"><button class="ib sl" data-go="${back}" aria-label="${icon === 'close' ? 'Close' : 'Back'}">${I(icon)}</button><span class="title-l">${title}</span></div>`;
+}
+function nav(cur){
+  const tabs = [['home','Home','home'],['items','Items','inventory_2'],['messages','Messages','chat_bubble'],['profile','Profile','person']];
+  return `<nav class="nav" aria-label="Main">${tabs.map(([k,l,ic]) =>
+    `<button data-tab="${k}" aria-current="${cur===k}"><span class="ind">${I(ic, cur===k ? 'fill' : '')}</span><span class="label-m">${l}</span></button>`).join('')}</nav>`;
+}
+function li({lead, head, sup, sup2, trail = '', attrs = '', cls = ''}){
+  const tag = attrs ? 'button' : 'div';
+  return `<${tag} class="li ${attrs ? 'sl' : ''} ${cls}" ${attrs}>${lead ? `<span class="lead">${lead}</span>` : ''}<span class="txt"><span class="body-l">${head}</span>${sup ? `<span class="body-m">${sup}</span>` : ''}${sup2 ? `<span style="display:block;margin-top:4px">${sup2}</span>` : ''}</span>${trail ? `<span class="trail">${trail}</span>` : ''}</${tag}>`;
+}
+const tag = (text, kind = '') => `<span class="tag label-m ${kind}">${text}</span>`;
+const chip = (label, attrs, pressed) => `<button class="chip label-l sl" ${attrs} aria-pressed="${pressed}">${pressed ? I('check','s18') : ''}${label}</button>`;
+
+/* ---------------- home (shared by all tasks) ---------------- */
+const DAYS = {1:14, 2:8, 3:3};
+const DATES = {1:'Wednesday 30 September', 2:'Wednesday 30 September', 3:'Listings end Tuesday 29 September'};
+
+function home(){
+  const t = S.task;
+  let attention = '', stats = [], groups = [];
+  if (t === 1){
+    const n = S.listed.length;
+    stats = [['Scheduled', 0, 'log'], ['Claimed', 0, ''], ['Available', n, '']];
+    if (!S.published){
+      attention = `<div class="card pad" style="margin-top:12px;display:grid;grid-template-columns:minmax(0,1fr) 88px;gap:8px;align-items:center">
+        <div><div class="title-m">Clear out what you're leaving behind</div><div class="body-m var" style="margin-top:4px">List things you no longer need so other students can pick them up before you go.</div></div>
+        <svg viewBox="0 0 92 92" width="88" height="88" aria-hidden="true"><circle cx="46" cy="50" r="38" fill="var(--md-sys-color-secondary-container)" fill-opacity=".6"/><path d="M40 40l6-20-12-8" stroke="#3A3A48" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M20 16l14-10 8 12z" fill="#E9BE63"/><path d="M56 34h14l-2 10h-10z" fill="#E47256"/><ellipse cx="59" cy="27" rx="3.5" ry="9" fill="#60AA88" transform="rotate(-18 59 27)"/><ellipse cx="67" cy="27" rx="3.5" ry="9" fill="#60AA88" transform="rotate(18 67 27)"/><rect x="18" y="46" width="58" height="36" fill="#D9A86C"/><path d="M18 46l-6 10h58l6-10z" fill="#C99356"/><rect x="40" y="62" width="14" height="5" rx="2" fill="#B98246"/></svg>
+      </div>`;
+    } else {
+      groups.push(['Available', S.listed.map(id => li({lead:thumb(id), head:ITEMS[id].name, sup:`${ROOMS[ITEMS[id].room]}, ${S.cond[id]}. No views yet`, trail:tag('Available')}))]);
+    }
+  }
+  if (t === 2){
+    stats = [['Scheduled', S.confirmed ? 1 : 0, 'log'], ['Claimed', S.confirmed ? 0 : 1, ''], ['Available', 4, '']];
+    attention = S.confirmed
+      ? `<div class="list" style="margin-top:12px">${li({lead:'<span class="avatar label-l">TK</span>', head:'Desk handover with Taylor', sup:`${S.slot}, ${S.place==='campus' ? 'Main Gate' : 'at your place'}`, trail:chev(), attrs:'data-go="t2status"'})}</div>`
+      : `<div class="banner sel sl" role="button" tabindex="0" data-go="${S.sent ? 't2status' : 't2claim'}" style="cursor:pointer"><span class="circle label-l">TK</span><div style="flex:1"><div class="title-s">${S.sent ? 'Waiting for Taylor to confirm' : 'Taylor wants your desk'}</div><div class="body-m">${S.sent ? 'You sent a time and place' : 'New claim, 2 minutes ago'}</div></div>${chev()}</div>`;
+    const lampTag = S.confirmed ? tag(S.slot, 'log') : S.sent ? tag('Waiting for Taylor') : tag('Claimed', 'sel');
+    groups.push([S.confirmed ? 'Scheduled' : 'Claimed', [li({lead:thumb('desk'), head:'Desk', sup:'Bedroom, Good', sup2:lampTag})]]);
+    const INTEREST = {lamp:'9 views, 2 saved', chair:'11 views, 1 saved', box:'14 views, no saves', plant:'5 views', dishes:'5 views', pots:'7 views, 1 saved', kettle:'6 views, 1 saved'};
+    groups.push(['Available', ['box','lamp','chair','plant'].map(id => id === 'box'
+      ? li({lead:thumb(id), head:ITEMS[id].name, sup:INTEREST[id], sup2:`<span class="tag label-m" style="background:transparent;border:1px solid var(--md-sys-color-outline);color:var(--md-sys-color-on-surface-variant);padding-left:4px">${I('trending_down','s18')}Low interest</span>`, trail:chev(), attrs:'data-soon="Lots of views but no saves. If it is still unclaimed 3 days before you move out, we will suggest faster ways to clear it."'})
+      : li({lead:thumb(id), head:ITEMS[id].name, sup:INTEREST[id], trail:tag('Available')}))]);
+  }
+  if (t === 3){
+    const rows = T3_ITEMS.map(([id,b,w]) => S.plans[id] ? [id,'log',S.plans[id]] : [id,b,w]);
+    const risk = rows.filter(r => r[1]==='risk'), log = rows.filter(r => r[1]==='log'), claimed = rows.filter(r => r[1]==='claimed');
+    stats = [['Scheduled', log.length, 'log'], ['Claimed', claimed.length, ''], ['At risk', risk.length, risk.length ? 'urg' : '']];
+    attention = `<div class="banner urg"><span class="circle">${I('schedule')}</span><div class="body-m"><b>3 days left.</b> Available items are now at risk. Confirm a plan before you leave.</div></div>`
+      + (risk.length
+        ? `<div class="sub-h"><span class="title-m">Needs a plan (${risk.length})</span></div><div class="list">${risk.map(([id,,w]) => li({lead:thumb(id), head:ITEMS[id].name, sup:S.changedPrices[id] != null ? `${Number(S.changedPrices[id])===0?'Free':'$'+Number(S.changedPrices[id]).toFixed(2)} · still waiting for a claim` : w, trail:`<span class="circle" style="background:var(--md-ext-urgency);color:var(--md-ext-on-urgency);width:32px;height:32px">${I('arrow_forward','s20')}</span>`, attrs:`data-t3item="${id}"`, cls:'urg'})).join('')}</div>`
+        : `<div class="banner done"><span class="circle">${I('check')}</span><div><div class="title-s">No available items at risk</div><div class="body-m">Drop-offs are scheduled. Finish arranging pickup for claimed items.</div></div></div>`);
+    groups.push(['Scheduled', log.map(([id,,p]) => {
+      const plan = typeof p === 'string' ? {label:p} : p;
+      return li({lead:thumb(id), head:ITEMS[id].name, sup2:`${tag(plan.label,'log')}${plan.backup ? `<span class="body-s var" style="display:block;margin-top:4px">Backup: ${plan.backup}</span>` : ''}`});
+    })]);
+    groups.push(['Claimed', claimed.map(([id,,w]) => li({lead:thumb(id), head:ITEMS[id].name, sup:w, sup2:tag('Claimed','sel')}))]);
+  }
+  return `${statusBar()}
+  <div class="appbar home"><span class="title-l brand" style="font-weight:700">MoveOut</span><button class="ib sl" aria-label="Notifications" data-soon="No new notifications.">${I('notifications')}</button></div>
+  <div class="body" style="${t===1 ? 'padding-bottom:96px' : ''}">
+    <div class="hero ${t===3 ? 'urgent' : ''}"><span class="blob"></span><span class="blob2"></span>
+      <div><div class="display-l">${DAYS[t]}</div><div class="title-m">days until you move out</div><div class="body-m sub">${DATES[t]}</div></div>
+    </div>
+    <div class="stats">${stats.map(([l,n,k]) => `<div class="stat ${k}"><b>${n}</b><span class="body-s">${l}</span></div>`).join('')}</div>
+    ${attention}
+    ${groups.filter(g => g[1].length).map(([h, rows]) => `<div class="sub-h"><span class="title-m">${h} (${rows.length})</span></div><div class="list">${rows.join('')}</div>`).join('')}
+  </div>
+  ${t===1 ? `<button class="fab sl label-l" data-act="openAdd">${I('add')}${S.published ? 'Add more' : 'Add items'}</button>` : ''}
+  ${nav('home')}`;
+}
+
+/* ---------------- task 1 screens ---------------- */
+const SCREENS = { home };
+
+SCREENS.capture = function(){
+  const r = S.room;
+  const here = S.tagged.filter(id => ITEMS[id].room === r);
+  const n = S.tagged.length;
+  const pins = !S.shot[r] ? '' : Object.entries(ITEMS).filter(([,v]) => v.room === r && v.x).map(([id,v]) => {
+    if (!S.tagged.includes(id)) return `<circle cx="${v.x}" cy="${v.y}" r="6" fill="#fff" fill-opacity=".92" stroke="#2B2521" stroke-width="1.2" pointer-events="none"/>`;
+    const w = v.name.length * 5.4 + 16, lx = Math.min(Math.max(v.x - w/2, 4), 316 - w);
+    return `<g pointer-events="none"><rect x="${lx}" y="${v.y-31}" width="${w}" height="17" rx="4" fill="#fff"/><text x="${lx+w/2}" y="${v.y-19.5}" text-anchor="middle" font-size="10" font-weight="600" fill="#1F2328" font-family="Inter,sans-serif">${v.name}</text><circle cx="${v.x}" cy="${v.y}" r="10" fill="var(--app-control)" stroke="#fff" stroke-width="2"/><path d="M${v.x-4.5} ${v.y}l3 3 6-6" stroke="var(--app-on-control)" stroke-width="2" fill="none" stroke-linecap="round"/></g>`;
+  }).join('');
+  const hots = S.shot[r] ? HOTS[r].map(([id,x,y,w,h]) => `<rect class="hot" x="${x}" y="${y}" width="${w}" height="${h}" rx="6" data-tag="${id}" role="button" tabindex="0" aria-label="${S.tagged.includes(id) ? 'Remove' : 'Add'} ${ITEMS[id].name}"/>`).join('') : '';
+  return `${statusBar()}${appbar('Snap a room','home','close')}
+  <div class="body">
+    <label class="title-s" for="room-type">What kind of room?</label>
+    <select id="room-type" class="room-select" aria-label="What kind of room?">${Object.entries(ROOMS).map(([k,l])=>`<option value="${k}" ${r===k?'selected':''}>${l}</option>`).join('')}</select>
+    <div class="photo">
+      <svg viewBox="0 0 320 220" role="group" aria-label="${ROOMS[r]} sample photo">${SCENES[r]}${hots}${pins}</svg>
+      ${S.shot[r] ? '' : `<div class="finder">
+        <span class="corner" style="left:14px;top:14px;border-right:0;border-bottom:0"></span><span class="corner" style="right:14px;top:14px;border-left:0;border-bottom:0"></span>
+        <span class="corner" style="left:14px;bottom:14px;border-right:0;border-top:0"></span><span class="corner" style="right:14px;bottom:14px;border-left:0;border-top:0"></span>
+        <span class="body-m">Sample room photo</span>
+        <button class="shutter" data-act="shoot" aria-label="Take photo"></button>
+      </div>`}
+    </div>
+    ${S.shot[r] ? `
+      <div class="title-m" style="margin-top:16px">Tap everything you're letting go</div>
+      <div class="body-m var">One photo, as many items as you like. Details come later.</div>
+      <div class="chips" style="margin-top:12px">${here.map(id => `<span class="chip input label-l">${ITEMS[id].name}<button class="x sl" data-tag="${id}" aria-label="Remove ${ITEMS[id].name}">${I('close','s18')}</button></span>`).join('')}</div>
+      <div style="display:flex;gap:8px;margin-top:8px"><button class="btn text label-l sl" data-act="retake">${I('refresh')}Retake</button></div>
+    ` : `<div class="body-m var" style="margin-top:12px">Choose a room type, then try the sample photo. This prototype does not use your camera.</div>`}
+  </div>
+  <div class="bottom"><button class="btn filled block label-l sl" data-act="toOrganise">${n ? `Add ${plural(n,'item')}` : 'Add items'}</button><div class="err body-s" role="alert">${S.error}</div></div>`;
+};
+
+SCREENS.single = function(){
+  const f = S.single;
+  return `${statusBar()}${appbar('Add an item', S.tagged.length ? 'organise' : 'home', 'close')}
+  <div class="body stack">
+    ${f.photo
+      ? `<div class="photo" style="height:150px;display:grid;place-items:center;background:var(--app-room-bedroom)"><svg viewBox="0 0 44 44" width="110" height="110" aria-hidden="true">${THUMB[guessArt(f.name)] || THUMB_GENERIC}</svg><button class="btn tonal label-l sl" data-act="singlePhoto" style="position:absolute;right:8px;bottom:8px">${I('refresh')}Retake</button></div>`
+      : `<button class="dash sl" data-act="singlePhoto"><span>${I('photo_camera')}<br><span class="label-l">Take a photo</span></span></button>`}
+    <div class="field"><label class="body-s">What is it?</label><input id="single-name" value="${f.name.replace(/"/g,'&quot;')}" placeholder="Desk lamp" autocomplete="off"></div>
+    <div><div class="title-s" style="margin:4px 0 8px">What kind of room?</div><div class="chips">${Object.entries(ROOMS).map(([k,l]) => chip(l, `data-sroom="${k}"`, f.room === k)).join('')}</div></div>
+    <div><div class="title-s" style="margin:4px 0 8px">Condition</div><div class="segb" role="group">${CONDS.map(c => `<button class="label-l sl" data-scond="${c}" aria-pressed="${f.cond===c}">${f.cond===c ? I('check','s18') : ''}${c}</button>`).join('')}</div></div>
+    <div class="support body-s">${I('info','s18')}<span>Got several things to add? Snapping a whole room is quicker.</span></div>
+  </div>
+  <div class="bottom"><button class="btn filled block label-l sl" data-act="addSingle">Add item</button><div class="err body-s" role="alert">${S.error}</div></div>`;
+};
+
+function guessArt(name){
+  const n = name.toLowerCase();
+  const map = [['lamp','lamp'],['desk','desk'],['table','desk'],['chair','chair'],['box','box'],['storage','box'],['plant','plant'],['plate','dishes'],['dish','dishes'],['bowl','dishes'],['mug','mugs'],['cup','mugs'],['pot','pots'],['pan','pots'],['kettle','kettle'],['toaster','toaster']];
+  const hit = map.find(([k]) => n.includes(k));
+  return hit ? hit[1] : null;
+}
+
+SCREENS.organise = function(){
+  const groups = Object.keys(ROOMS).map(r=>[r,S.tagged.filter(id=>ITEMS[id].room===r)]).filter(([,ids])=>ids.length);
+  return `${statusBar()}${appbar('Condition, price & size','capture')}<div class="body">
+    <div class="body-m var">Select the items to list. Check condition, price and transport before continuing.</div>
+    ${groups.map(([r,ids])=>`<div class="sub-h"><span class="title-m">${ROOMS[r]} (${ids.length})</span><button class="btn text label-l sl" data-selall="${r}">${ids.every(id=>S.selected.has(id))?'Clear all':'Select all'}</button></div><div class="list">${ids.map(id=>{
+      const open=S.expanded===id,d=S.dimensions[id]||{};
+      return `<div class="li item-edit" style="flex-wrap:wrap"><span class="lead">${thumb(id)}</span><span class="txt"><span class="body-l">${ITEMS[id].name}</span><span class="body-m">${S.cond[id]} · ${priceText(id)}</span></span><button class="cb sl" role="checkbox" aria-checked="${S.selected.has(id)}" aria-label="Include ${ITEMS[id].name}" data-sel="${id}"><span class="box">${S.selected.has(id)?I('check','s18'):''}</span></button>
+      <div class="edit-summary"><span class="body-s var">${sizeText(id)} · ${S.transport[id]||'Transport needed'}</span><button class="btn text label-l sl" data-expand="${id}" aria-label="Edit ${ITEMS[id].name}" aria-expanded="${open}">${open?'Done':'Edit'}</button></div>
+      ${open?`<div class="item-fields stack"><div class="title-s">Condition</div><div class="segb" role="group" aria-label="Condition for ${ITEMS[id].name}">${CONDS.map(c=>`<button class="label-l sl" data-setcond="${id}" data-val="${c}" aria-pressed="${S.cond[id]===c}">${c}</button>`).join('')}</div>
+      <div class="title-s">Price</div><div class="segb" role="group" aria-label="Price for ${ITEMS[id].name}">${[['free','Free'],['set','Set a price']].map(([k,l])=>`<button class="label-l sl" data-price-mode="${id}" data-val="${k}" aria-pressed="${(S.priceModes[id]||'free')===k}">${l}</button>`).join('')}</div>
+      ${S.priceModes[id]==='set'?`<div class="field"><label for="price-${id}" class="body-s">Price (A$)</label><input id="price-${id}" type="number" min="0.01" step="0.01" inputmode="decimal" data-priceinput="${id}" value="${esc(S.prices[id]||'')}" placeholder="e.g. 25"></div>`:''}
+      <div class="title-s">Dimensions (cm)</div><div class="dimension-grid">${[['l','Length'],['w','Width'],['h','Height']].map(([k,label])=>`<div class="field"><label for="dim-${id}-${k}" class="body-s">${label}</label><input id="dim-${id}-${k}" aria-label="${label} of ${ITEMS[id].name}" type="number" min="0.1" step="any" inputmode="decimal" data-dimension="${id}" data-axis="${k}" value="${esc(d[k]||'')}" placeholder="cm"></div>`).join('')}</div>
+      <div class="title-s">Transport needed</div><div class="chips">${TRANSPORT.map(t=>chip(t,`data-transport="${id}" data-val="${t}"`,S.transport[id]===t)).join('')}</div>
+      ${SAMPLE_DETAILS[ITEMS[id].art||id]?`<button class="btn text label-l sl" data-sample-details="${id}">Use sample dimensions & transport</button>`:''}
+      </div>`:''}</div>`;
+    }).join('')}</div>`).join('')}
+    <div class="btnrow" style="margin-top:12px"><button class="btn outlined label-l sl" data-go="capture">Snap a room</button><button class="btn outlined label-l sl" data-act="newSingle">Add one item</button></div>
+  </div><div class="bottom"><button class="btn filled block label-l sl" data-act="toDetails">Continue with ${plural(chosen().length,'item')}</button><div class="err body-s" role="alert">${S.error}</div></div>`;
+};
+
+SCREENS.details = function(){
+  const n = chosen().length;
+  return `${statusBar()}${appbar('Pickup details','organise')}
+  <div class="body">
+    <div class="body-m var">These apply to all ${plural(n,'item')}. You can change any item on the next screen.</div>
+    <div class="card pad" style="margin-top:12px">
+      <div class="title-m">Where can people collect?</div>
+      <button class="rb sl" role="radio" aria-checked="${S.pickup==='campus'}" data-pickup="campus"><span class="dot"></span><span><span class="body-l">Campus pickup point</span><span class="body-m">Main Gate, University of Sydney</span></span></button>
+      <button class="rb sl" role="radio" aria-checked="${S.pickup==='home'}" data-pickup="home"><span class="dot"></span><span><span class="body-l">Near my place</span><span class="body-m">Shown as Glebe until you confirm a pickup</span></span></button>
+      <div class="support body-s">${I('lock','s18')}<span>Your exact address and contact details are only shared after you both confirm a handover.</span></div>
+    </div>
+    <div class="card pad">
+      <div class="title-m" style="margin-bottom:12px">When are you usually free?</div>
+      <div class="chips">${TIMES.map(t => chip(t, `data-time="${t}"`, S.times.has(t))).join('')}</div>
+    </div>
+    <div class="card pad" style="display:flex;gap:16px;align-items:flex-start">
+      ${I('event','var')}<div><div class="title-m">Listed until Tuesday 29 September</div><div class="body-m var">The day before you move out. Anything unclaimed gets flagged three days before.</div></div>
+    </div>
+
+  </div>
+  <div class="bottom"><button class="btn filled block label-l sl" data-act="toReview">Review items</button><div class="err body-s" role="alert">${S.error}</div></div>`;
+};
+
+SCREENS.review = function(){
+  const ids = chosen();
+  const whereOf = id => (S.where[id] || S.pickup) === 'campus' ? 'Main Gate' : 'Near my place';
+  return `${statusBar()}${appbar('Review and publish','details')}
+  <div class="body">
+    <div class="card pad">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span class="title-m">Shared details</span><button class="btn text label-l sl" data-go="details">Edit</button></div>
+      ${[['location_on', S.pickup === 'campus' ? 'Main Gate, campus' : 'Near my place, Glebe'], ['schedule', [...S.times].join(', ') || 'No times yet'], ['event','Until Tuesday 29 September']]
+        .map(([ic, t]) => `<div style="display:flex;gap:16px;align-items:center;padding:6px 0" class="body-m">${I(ic,'s20 var')}<span>${t}</span></div>`).join('')}
+    </div>
+    <div class="banner log">${I('visibility')}<div><div class="title-s">Who will see these</div><div class="body-m">Students within 5 km of your pickup point and your accommodation group. They can save or claim items; you choose when and where to hand over.</div></div></div>
+    <div class="sub-h"><span class="title-m">${plural(ids.length,'item')}</span></div>
+    <div class="list">${ids.map(id => {
+      const open = S.expanded === id, p = S.prices[id];
+      const price = priceText(id);
+      const custom = S.where[id] && S.where[id] !== S.pickup;
+      return `<div class="li" style="flex-wrap:wrap">
+        <span class="lead">${thumb(id)}</span>
+        <span class="txt"><span class="body-l">${ITEMS[id].name}</span><span class="body-m">${S.cond[id]}, ${price}${custom ? `, ${whereOf(id)}` : ''}<br>${sizeText(id)}<br>${S.transport[id] || 'Transport needed'}</span></span>
+        <button class="btn text label-l sl" data-expand="${id}" aria-expanded="${open}">${open ? 'Done' : 'Edit'}</button>
+        ${open ? `<div style="flex-basis:100%;padding:4px 0 8px" class="stack">
+          <button class="btn text label-l sl" data-edit-item="${id}">Edit condition, price & size</button>
+          <div class="chips">${[['campus','Main Gate'],['home','Near my place']].map(([k,l]) => chip(l, `data-where="${id}" data-val="${k}"`, (S.where[id] || S.pickup) === k)).join('')}</div>
+        </div>` : ''}
+      </div>`;
+    }).join('')}</div>
+  </div>
+  <div class="bottom"><button class="btn filled block label-l sl" data-act="publish">Publish ${plural(ids.length,'item')}</button><div class="err body-s" role="alert">${S.error}</div></div>`;
+};
+
+/* ---------------- task 2 screens ---------------- */
+function track(step){
+  return `<div class="track">${['Claimed','Scheduled','Collected'].map((l,i) => `<div class="label-m ${i < step ? 'on' : i === step ? 'now' : ''}"><span></span>${l}</div>`).join('')}</div>`;
+}
+SCREENS.t2claim = function(){
+  return `${statusBar()}${appbar('Claim','home')}
+  <div class="body">
+    <div class="card pad">
+      <div style="display:flex;gap:16px;align-items:center">${thumb('desk')}<div><div class="title-m">Desk</div><div class="body-m var">Good, Free</div><div class="body-s var">120 × 60 × 75 cm, about 18 kg</div></div></div>
+      <div style="margin-top:16px">${track(1)}</div>
+    </div>
+    <div class="card pad">
+      <div style="display:flex;gap:16px;align-items:center"><span class="avatar label-l">TK</span><div><div class="title-m">Taylor K.</div><div class="body-m var">Verified student</div></div></div>
+      <div class="stats" style="margin-top:12px">
+        <div class="stat" style="background:var(--md-sys-color-surface-container-high)"><b>3</b><span class="body-s">Pickups done</span></div>
+        <div class="stat" style="background:var(--md-sys-color-surface-container-high)"><b>0</b><span class="body-s">No-shows</span></div>
+        <div class="stat" style="background:var(--md-sys-color-surface-container-high)"><b>&lt;1 h</b><span class="body-s">Usual reply</span></div>
+      </div>
+      <div class="chips" style="margin-top:10px">${tag('On time')}${tag('Easy to arrange')}</div>
+      <div class="bubble in body-m" style="background:var(--md-sys-color-surface-container-high);max-width:100%;margin-top:12px">Hi! Is the desk still available? I can borrow a friend's car on weekday evenings.</div>
+      <div class="divider"></div>
+      <div style="display:flex;gap:16px;padding:4px 0">${I('schedule','var')}<div><div class="body-l">Usually free</div><div class="body-m var">Weekday evenings, Saturday mornings</div></div></div>
+      <div style="display:flex;gap:16px;padding:4px 0">${I('directions_car','var')}<div><div class="body-l">Getting there</div><div class="body-m var">Borrowed car, coming alone</div></div></div>
+    </div>
+    <div class="support body-s">${I('lock','s18')}<span>Taylor can't see your phone number or address. You choose what to share when you arrange the handover.</span></div>
+  </div>
+  <div class="bottom stack"><button class="btn filled block label-l sl" data-go="t2arrange">Arrange handover</button>
+    <div class="btnrow"><button class="btn outlined label-l sl" data-go="t2chat">${I('chat_bubble')}Message</button><button class="btn text label-l sl" data-act="decline">Decline</button></div></div>`;
+};
+SCREENS.t2chat = function(){
+  const msgs = [['in','Hi! Is the desk still available? I can borrow a friend\'s car on weekday evenings.'], ...S.chat];
+  return `${statusBar()}
+  <div class="appbar"><button class="ib sl" data-go="${S.sent ? 't2status' : 't2claim'}" aria-label="Back">${I('arrow_back')}</button><span class="avatar label-l" style="margin-right:8px">TK</span><span class="title-l">Taylor K.</span></div>
+  <div class="body" id="chatbody">
+    <div class="body-s var" style="text-align:center;margin:4px 0 8px">Messages stay in the app. Your number is never shared.</div>
+    ${msgs.map(([d,t]) => d === 'action'
+      ? `<div class="card pad" style="margin-top:10px"><div class="body-m">Ready to lock in a time and place?</div><button class="btn filled label-l sl" data-go="t2arrange" style="margin-top:10px">Arrange handover</button></div>`
+      : `<div class="bubble ${d} body-m">${esc(t)}</div>`).join('')}
+    ${S.typing ? `<div class="bubble in body-m var">Taylor is typing…</div>` : ''}
+  </div>
+  ${S.chat.length ? '' : `<div class="chips" style="padding:0 12px 8px;background:var(--md-sys-color-surface)">${['Does Thursday evening work?','Will the desk fit in your car?'].map(q => `<button class="chip label-l sl" data-quick="${q}" aria-pressed="false">${q}</button>`).join('')}</div>`}
+  <div class="composer"><div class="pill"><input id="chat-input" placeholder="Message" aria-label="Message"></div><button class="ib sl" data-act="sendMsg" aria-label="Send" style="background:var(--md-sys-color-primary);color:var(--md-sys-color-on-primary)">${I('send')}</button></div>`;
+};
+SCREENS.t2arrange = function(){
+  const slots = S.customSlot ? [...SLOTS, S.customSlot] : SLOTS;
+  const fit = `<div class="banner ${S.place==='campus'?'sel':'log'}">${I('directions_car')}<div><div class="title-s">Car needed</div><div class="body-m">${S.place==='campus'?'Bring the desk to Main Gate.':'Taylor will bring a car. Remove the desk legs for transport.'}</div></div></div>`;
+  return `${statusBar()}${appbar('Arrange handover','t2claim')}
+  <div class="body">
+    <div class="list">${li({lead:thumb('desk'), head:'Desk for Taylor K.', sup:'120 × 60 × 75 cm, about 18 kg'})}</div>
+    <div class="card pad">
+      <div class="title-m">When</div>
+      <div class="body-m var" style="margin-bottom:12px">Times you're both free, before your listing ends</div>
+      <div class="chips">${slots.map(t => chip(t, `data-slot="${t}"`, S.slot === t)).join('')}<button class="chip label-l sl" data-act="otherTime" aria-pressed="false">${I('add','s18')}Other time</button></div>
+      <div class="support body-s">${I('event_repeat','s18')}<span>Based on your availability (weekday evenings, weekends) and Taylor's. <button class="btn text label-m sl" data-soon="Availability is edited in Profile, which is outside this task." style="height:auto;padding:0">Edit availability</button></span></div>
+    </div>
+    <div class="card pad">
+      <div class="title-m">Where</div>
+      <button class="rb sl" role="radio" aria-checked="${S.place==='home'}" data-place="home"><span class="dot"></span><span><span class="body-l">At my place</span><span class="body-m">Taylor sees Glebe now, your street only after confirming</span></span></button>
+      <button class="rb sl" role="radio" aria-checked="${S.place==='campus'}" data-place="campus"><span class="dot"></span><span><span class="body-l">Campus pickup point</span><span class="body-m">Main Gate, University of Sydney. Busy and public.</span></span></button>
+
+    </div>
+    ${fit}
+  </div>
+  <div class="bottom"><button class="btn filled block label-l sl" data-act="sendPlan">Send to Taylor</button><div class="err body-s" role="alert">${S.error}</div></div>`;
+};
+SCREENS.t2status = function(){
+
+  const where = S.place==='campus' ? ['Main Gate, University of Sydney','Meet at the gate on the campus side'] : ['Your place, Glebe', `${S.confirmed ? 'Street address shared with Taylor' : 'Street shared once Taylor confirms'}`];
+  return `${statusBar()}${appbar('Handover','home')}
+  <div class="body">
+    ${S.confirmed
+      ? `<div class="banner log" style="margin-top:0"><span class="circle">${I('event_available')}</span><div><div class="title-s">Handover confirmed</div><div class="body-m">You and Taylor both have these details.</div></div></div>`
+      : `<div class="banner sel" style="margin-top:0"><span class="circle">${I('hourglass_top')}</span><div><div class="title-s">Waiting for Taylor</div><div class="body-m">The desk stays reserved for 24 hours.</div></div></div>`}
+    <div class="card pad">${track(S.confirmed ? 2 : 1)}</div>
+    <div class="card" style="overflow:hidden">
+      ${MINIMAP}
+      <div style="padding:8px 16px 12px">
+        ${[['schedule', S.slot, 'Reminder for both of you 2 hours before'], ['location_on', where[0], where[1]], ['person', 'Taylor K.', 'Collecting your desk by car']]
+          .map(([ic,a,b]) => `<div style="display:flex;gap:16px;padding:8px 0">${I(ic,'var')}<div><div class="body-l">${a}</div><div class="body-m var">${b}</div></div></div>`).join('')}
+      </div>
+    </div>
+    <div class="btnrow" style="margin-top:12px"><button class="btn outlined label-l sl" data-go="t2chat">${I('chat_bubble')}Message</button><button class="btn outlined label-l sl" data-go="t2arrange">${I('edit_calendar')}Change</button></div>
+  </div>
+  <div class="bottom"><button class="btn filled block label-l sl" data-go="home">Back to home</button></div>`;
+};
+
+/* ---------------- task 3 screens ---------------- */
+function nextStepSheet(){
+  const id=S.t3item, why=S.changedPrices[id]!=null?`${Number(S.changedPrices[id])===0?'Free':'$'+Number(S.changedPrices[id]).toFixed(2)} · still waiting for a claim`:T3_ITEMS.find(r=>r[0]===id)[2];
+  return `<div class="scrim" data-act="closeSheet"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="next-step-title"><div class="handle"></div>
+    <div class="headline-s" id="next-step-title">Choose a next step</div>
+    <div class="body-m var" style="margin:4px 0 12px">${ITEMS[id].name} · 3 days left</div>
+    <div class="list" style="margin-bottom:12px">${li({lead:thumb(id,40),head:ITEMS[id].name,sup:why,cls:'urg'})}</div>
+    <div class="list">${Object.entries(OPTS).map(([key,o])=>li({lead:`<span class="circle" style="background:var(--${key==='donate'?'md-sys-color-secondary-container':'md-sys-color-surface-container-high'});color:var(--md-sys-color-on-surface);margin:8px">${I(o.icon)}</span>`,head:o.title,sup:o.desc,trail:chev(),attrs:`data-opt="${key}"`})).join('')}</div>
+  </div></div>`;
+}
+const DONATION_PLACE = {name:'Community Donation Centre', address:'123 Example Street, Glebe', distance:'800 m · about 10 min on foot', hours:'Mon–Tue, 10 AM–5 PM'};
+function donationLocationCard(){
+  return `<section class="card" aria-label="Donation drop-off location" style="overflow:hidden;margin-top:12px">
+    <div style="padding:16px 16px 12px"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="title-m">Drop-off location</span>${tag('Example location')}</div></div>
+    <div role="img" aria-label="Illustrative map showing the donation centre; not a navigation map">${MINIMAP.replaceAll('var(--log-fg)','var(--md-sys-color-tertiary)')}</div>
+    <div style="padding:16px">
+      <div style="display:flex;gap:12px;align-items:flex-start">${I('location_on','var')}<div><div class="title-s">${DONATION_PLACE.name}</div><div class="body-m var">${DONATION_PLACE.address}</div></div></div>
+      <div class="support body-m" style="margin-top:12px">${I('directions_walk','s20')}<span>${DONATION_PLACE.distance}</span></div>
+      <div class="support body-m">${I('schedule','s20')}<span>Drop-off hours: ${DONATION_PLACE.hours}</span></div>
+      <div class="body-s var" style="margin-top:12px">Sample address, distance and hours for this prototype.</div>
+    </div>
+  </section>`;
+}
+SCREENS.t3confirm = function(){
+  const id=S.t3item,o=OPTS[S.t3opt];
+  return `${statusBar()}${appbar(o.title,'t3opts')}<div class="body"><div class="list">${li({lead:thumb(id),head:ITEMS[id].name,sup:o.desc})}</div>
+    ${S.t3opt==='donate'?`${donationLocationCard()}<div class="card pad"><div class="title-m">Has this charity agreed to accept it?</div><div class="chips" style="margin-top:12px">${chip('Yes, confirmed','data-charity-yes="yes"',S.charityYes)}${chip('Not yet','data-charity-yes="no"',!S.charityYes)}</div><p class="body-m var">Confirm acceptance with ${DONATION_PLACE.name} before saving your plan.</p></div><div class="card pad"><div class="title-m" style="margin-bottom:12px">${o.q}</div><div class="chips">${o.choices.map(c=>chip(c,`data-pick="${c}"`,S.t3pick.has(c))).join('')}</div></div><div class="support body-s">${I('info','s18')}<span>Save your own drop-off schedule. This does not book a charity service.</span></div>`:
+    `<div class="card pad"><div class="field" style="margin-top:8px"><label for="new-price" class="body-s">New price (A$)</label><input id="new-price" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0 for free" value="${esc(S.newPrice)}"></div><button class="btn text label-l sl" data-act="makeFree">Offer it free</button></div><div class="banner urg"><div class="body-m">The item stays <b>At risk</b> until someone claims it or you confirm a schedule.</div></div>`}
+  </div><div class="bottom"><button class="btn filled block label-l sl" data-act="confirmPlan">${S.t3opt==='donate'?'Yes, save this schedule':'Yes, update the listing'}</button><div class="err body-s" role="alert">${S.error}</div></div>`;
+};
+SCREENS.messages = function(){return `${statusBar()}${appbar('Messages','home')}<div class="body"><div class="card pad"><div class="title-m">No messages yet</div><p class="body-m var">Conversations about claims and pickups appear here.</p></div></div>${nav('messages')}`;};
+SCREENS.items = function(){
+  let rows=[];
+  if(S.task===1) rows=S.listed.map(id=>({id,status:'Available',detail:`${S.cond[id]} · ${priceText(id)}`}));
+  if(S.task===2) rows=[{id:'desk',status:S.confirmed?'Scheduled':'Claimed',detail:S.confirmed?S.slot:'Taylor wants your desk'},...['box','lamp','chair','plant'].map(id=>({id,status:'Available',detail:ITEMS[id].cond}))];
+  if(S.task===3) rows=T3_ITEMS.map(([id,status,detail])=>({id,status:S.plans[id]?'Scheduled':status==='log'?'Scheduled':status==='claimed'?'Claimed':'At risk',detail:S.plans[id]?.label||(S.changedPrices[id]!=null?`${Number(S.changedPrices[id])===0?'Free':'$'+Number(S.changedPrices[id]).toFixed(2)} · still waiting for a claim`:detail)}));
+  const filters=['All','Scheduled','Claimed',S.task===3?'At risk':'Available'];
+  return `${statusBar()}${appbar('Your items','home')}<div class="body"><div class="chips" style="margin-bottom:12px">${filters.map(f=>chip(`${f} ${rows.filter(r=>f==='All'||r.status===f).length}`,`data-filter="${f}"`,S.filter===f||f==='All'&&S.filter==='all')).join('')}</div><div class="list">${rows.filter(r=>['all','All'].includes(S.filter)||r.status===S.filter).map(r=>li({lead:thumb(r.id),head:ITEMS[r.id].name,sup:r.detail,sup2:tag(r.status,r.status==='At risk'?'urg':r.status==='Scheduled'?'log':''),trail:r.status==='At risk'?chev():'',attrs:r.status==='At risk'?`data-t3item="${r.id}"`:''})).join('')||'<div class="pad body-m var">No items with this status.</div>'}</div></div>${nav('items')}`;
+};
+
+
+/* ---------------- sheets ---------------- */
+function sheetHtml(){
+  if (S.sheet === 't3opts') return nextStepSheet();
+  if (S.sheet === 'add') return `<div class="scrim" data-act="closeSheet"><div class="sheet" role="dialog" aria-label="Add items"><div class="handle"></div>
+    <div class="headline-s">How do you want to add items?</div>
+
+    <div class="list">
+      ${li({lead:`<span class="circle" style="background:var(--md-sys-color-secondary-container);color:var(--md-sys-color-on-secondary-container);margin:8px">${I('photo_camera')}</span>`, head:'Snap a room', sup:"Take one photo and tap every item you're letting go", sup2:tag('Quickest for several items','log'), trail:chev(), attrs:'data-act="startSnap"'})}
+      ${li({lead:`<span class="circle" style="background:var(--md-sys-color-surface-container-high);margin:8px">${I('add_photo_alternate')}</span>`, head:'Add one item', sup:'Photo and details for a single thing', trail:chev(), attrs:'data-act="newSingle"'})}
+    </div></div></div>`;
+  if (S.sheet === 'time'){
+    const days = ['Tue 22 Sep','Wed 23 Sep','Thu 24 Sep','Fri 25 Sep','Sat 26 Sep','Mon 28 Sep','Tue 29 Sep'];
+    const times = ['10 AM','2 PM','6 PM','7:30 PM'];
+    return `<div class="scrim" data-act="closeSheet"><div class="sheet" role="dialog" aria-label="Suggest another time"><div class="handle"></div>
+      <div class="headline-s">Suggest another time</div>
+      <div class="body-m var" style="margin:4px 0 12px">Taylor will be asked to accept it. Days after Tue 29 Sep aren't shown because your listing ends then.</div>
+      <div class="title-s" style="margin-bottom:8px">Day</div>
+      <div class="chips">${days.map(x => chip(x, `data-oday="${x}"`, S.oday === x)).join('')}</div>
+      <div class="title-s" style="margin:16px 0 8px">Time</div>
+      <div class="chips">${times.map(x => chip(x, `data-otime="${x}"`, S.otime === x)).join('')}</div>
+      <button class="btn filled block label-l sl" data-act="useOther" style="margin-top:20px">Use this time</button>
+      <div class="err body-s" role="alert">${S.error}</div>
+    </div></div>`;
+  }
+  if (S.sheet && S.sheet.startsWith('cond:')){
+    const id = S.sheet.slice(5);
+    return `<div class="scrim" data-act="closeSheet"><div class="sheet" role="dialog" aria-label="Condition"><div class="handle"></div>
+      <div class="headline-s">Condition of ${ITEMS[id].name.toLowerCase()}</div>
+      ${[['Like new','Barely used, no marks'],['Good','Normal wear, works well'],['Used','Visible wear, still works']].map(([c,d]) => `<button class="rb sl" role="radio" aria-checked="${S.cond[id]===c}" data-pickcond="${c}"><span class="dot"></span><span><span class="body-l">${c}</span><span class="body-m">${d}</span></span></button>`).join('')}
+    </div></div>`;
+  }
+  return '';
+}
+
+/* ---------------- flow panel ---------------- */
+const STEPS = {
+1:[
+  ['home','Home','Starts from the move-out date. The extended FAB is the only way in.',['DR2','ER2']],
+  ['sheet:add','Add items','Snapping a room is offered first; adding one item is a working alternative, so choosing it is a finding, not a dead end.',['FR4','ER1']],
+  ['capture','Room snapshot','One photo per room; tapping objects creates items. Choose the room type before using the sample photo.',['FR4','DR1','ER1','ER2']],
+  ['single','Add one item','Slower single-item path with the same data fields.',['DR1']],
+  ['organise','Check your items','Grouped by room; edit condition, price, dimensions and transport together.',['FR4','DR1']],
+  ['details','Pickup details','Place, times and deadline shared across the batch; address stays private.',['FR3','DR2','DR3','FR6','DR6']],
+  ['review','Review and publish','Review size and transport; edit pickup location or return to item details. Says who will see the items, so redistribution is not a black box.',['FR3','DR1','DR3','FR1']]
+],
+2:[
+  ['home','Claim arrives','The claim sits above the item list. Views and saves show interest; the storage box is flagged early as low interest.',['FR2','DR4','FR1']],
+  ['t2claim','Claim details','Item size, and reliability signals instead of star ratings: pickups done, no-shows, reply speed.',['FR2','FR5','FR6']],
+  ['t2chat','Message first','Participants who prefer to talk first can, then jump to arranging.',['FR6','ER4']],
+  ['t2arrange','Time and place','Shared free times or a custom time, pickup location and a short transport reminder.',['FR5','DR2','DR3','ER4','FR6','DR6']],
+  ['t2status','Handover agreed','Status goes from waiting to confirmed; both sides see the same details.',['FR2','DR4']]
+],
+3:[
+  ['home','At-risk home','Available items become At risk with three days left; colour highlights the deadline.',['FR7','DR2','DR4','ER2']],
+  ['t3opts','Faster strategies','A bottom sheet keeps the item list in view: donate, or change the price / offer it free.',['FR7','DR5']],
+  ['t3confirm','Confirm the action','Review the drop-off map, location and hours, then confirm acceptance and a date; repricing keeps the item At risk.',['FR5','DR2','DR5']],
+  ['t3done','Schedules saved','At-risk drops only when a confirmed schedule is saved.',['DR4','DR5']]
+]};
+const TASKS = {
+  1:{title:'Task 1: organise multiple items', text:'You are moving out of your current accommodation in two weeks. In your bedroom, you have a desk, chair, desk lamp, and storage box that you no longer want. Use the app to organise these items and make them available for redistribution before you move out.', sub:'The task never mentions photos, so the room snapshot has to be discoverable on its own. Adding items one at a time also works, so you can see which path people take.'},
+  2:{title:'Task 2: arrange a handover', text:'Someone has claimed your desk. Use the app to arrange a handover so that you and the recipient both know when and where the collection will take place.', sub:'Taylor confirms a moment after you send a time and place, and replies if you message first.'},
+  3:{title:'Task 3: resolve items at risk', text:'You are leaving in three days. Two of your items still do not have a confirmed recipient or collection plan. Use the app to decide what to do with them and make sure they can realistically be cleared before you leave.', sub:'Fresh uses blue-green tones. Deadline mode adds an amber countdown and red-orange risk labels.'}
+};
+const ROLE_LIST = ['md-sys-color-primary','md-sys-color-on-primary','md-sys-color-secondary-container','md-sys-color-on-secondary-container','md-sys-color-tertiary-container','md-sys-color-on-tertiary-container','md-sys-color-surface','md-sys-color-surface-container-lowest','md-sys-color-surface-container','md-sys-color-on-surface','md-sys-color-on-surface-variant','md-sys-color-outline-variant','md-ext-urgency','md-ext-urgency-container','md-ext-on-urgency-container','md-ext-collected-container','md-ext-on-collected-container','app-hero','app-control'];
+
+function currentStep(){
+  if (S.sheet === 't3opts') return 't3opts';
+  if (S.sheet === 'add') return 'sheet:add';
+  if (S.task === 3 && S.screen === 'home' && Object.keys(S.plans).length >= 2) return 't3done';
+  return S.screen;
+}
+function renderPanel(){
+  const cur = currentStep();
+  document.getElementById('steps').innerHTML = STEPS[S.task].map(([k,t,w,r],i) =>
+    `<button class="step" data-jump="${k}" aria-current="${cur===k}"><span class="num">${i+1}</span><span><b>${t}</b><span class="why">${w}</span><span class="reqs">${r.map(x => `<span class="req">${x}</span>`).join('')}</span></span></button>`).join('');
+  const cs = getComputedStyle(document.getElementById('phone'));
+  document.getElementById('roles').innerHTML = ROLE_LIST.map(r => {
+    const v = cs.getPropertyValue('--' + r).trim();
+    return `<div class="role"><i style="background:${v}"></i><span>${r.replace(/^md-sys-color-|^md-ext-|^app-/,'')}<code>${v}</code></span></div>`;
+  }).join('');
+}
+
+/* ---------------- render + theme ---------------- */
+let keepScroll = false;
+function render(){
+  const scr = document.getElementById('screen');
+  const prev = scr.querySelector('.body')?.scrollTop || 0;
+  scr.innerHTML = SCREENS[S.screen]() + sheetHtml() + (S.snack ? `<div class="snack body-m ${['home'].includes(S.screen) ? '' : 'low'}" role="status">${S.snack}</div>` : '');
+  const b = scr.querySelector('.body');
+  if (b && keepScroll) b.scrollTop = prev;
+  if(S.sheet==='t3opts'){
+    if(b)b.scrollTop=S.strategyScroll || 0;
+    for(const child of scr.children) if(!child.classList.contains('scrim'))child.inert=true;
+    scr.querySelector('[role="dialog"] button')?.focus({preventScroll:true});
+  }
+  if (S.screen === 't2chat' && b) b.scrollTop = b.scrollHeight;
+  keepScroll = false;
+  renderPanel();
+}
+const stay = () => { keepScroll = true; render(); };
+function go(screen){
+  if(screen==='t3opts'){
+    if(['home','items'].includes(S.screen)){
+      S.strategyOrigin=S.screen;
+      S.strategyScroll=document.querySelector('#screen > .body')?.scrollTop || 0;
+    }
+    S.screen=S.strategyOrigin || 'home';S.sheet='t3opts';S.error='';S.snack='';render();return;
+  }
+  S.screen = screen; S.sheet = null; S.error = ''; render();
+}
+function closeSheet(){
+  const strategy=S.sheet==='t3opts';S.sheet=null;stay();
+  if(strategy) document.querySelector(`[data-t3item="${S.t3item}"]`)?.focus({preventScroll:true});
+}
+function snack(msg){ S.snack = msg; stay(); clearTimeout(snack.t); snack.t = setTimeout(() => { S.snack = ''; stay(); }, 2600); }
+
+function applyTheme(){
+  const cls = PAL === 'fresh' ? (MODE === 'emergency' ? 'fresh-emg' : '') : PAL + (MODE === 'emergency' ? '-emg' : '');
+  document.getElementById('phone').className = 'phone ' + cls;
+  document.querySelectorAll('[data-palette]').forEach(b => b.setAttribute('aria-pressed', b.dataset.palette === PAL));
+  document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === MODE));
+  renderPanel();
+}
+function setTask(t, keepMode){
+  clearTimeout(window.t2timer);clearTimeout(snack.t);
+  S = fresh(); S.task = t; S.screen = 'home';
+  if (!keepMode) MODE = t === 3 ? 'emergency' : 'normal';
+  document.querySelectorAll('[data-task]').forEach(b => b.setAttribute('aria-pressed', b.dataset.task == t));
+  document.getElementById('task-title').textContent = TASKS[t].title;
+  document.getElementById('task-text').textContent = TASKS[t].text;
+  document.getElementById('flow-sub').textContent = TASKS[t].sub;
+  applyTheme(); render();
+}
+
+/* ---------------- actions ---------------- */
+function toggleTag(id){
+  const i = S.tagged.indexOf(id);
+  if (i >= 0){ S.tagged.splice(i,1); S.selected.delete(id); }
+  else { S.tagged.push(id); S.selected.add(id); S.cond[id] ??= ITEMS[id].cond; }
+  S.error = ''; stay();
+}
+function seedT1(){
+  if (S.tagged.length) return;
+  ['desk','chair','lamp','box'].forEach(id => { S.tagged.push(id); S.selected.add(id); S.cond[id] = ITEMS[id].cond; const sample=SAMPLE_DETAILS[id]; S.dimensions[id]={l:sample.l,w:sample.w,h:sample.h}; S.transport[id]=sample.transport; });
+  S.shot = {bedroom:true};
+}
+function reply(text, withAction){
+  const session=S;S.typing = true; stay();
+  setTimeout(() => { if(S!==session)return; S.typing = false; S.chat.push(['in', text]); if (withAction) S.chat.push(['action','']); if (S.screen === 't2chat') render(); }, 1200);
+}
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('button, [data-tag], [data-act], [data-go]');
+  if (!t) return;
+  const d = t.dataset;
+
+  if (d.task){ setTask(+d.task); return; }
+  if (d.palette){ PAL = d.palette; applyTheme(); return; }
+  if (d.mode){ MODE = d.mode; applyTheme(); return; }
+  if (d.jump){
+    const j = d.jump;
+    if (S.task === 1){
+      if (j === 'sheet:add'){ S.screen = 'home'; S.sheet = 'add'; render(); return; }
+      if (['organise','details','review'].includes(j)) seedT1();
+      if (j === 'single') S.single = {photo:false, name:'', room:'bedroom', cond:'Good'};
+      go(j); return;
+    }
+    if (S.task === 2){
+      if (j === 'home') Object.assign(S, {slot:null, customSlot:null, place:'home', access:null, help:false, sent:false, confirmed:false, chat:[]});
+      if (j === 't2status'){ S.slot = S.slot || SLOTS[1]; S.access = S.access || 'stairs'; S.help = true; S.sent = true; S.confirmed = true; }
+      go(j); return;
+    }
+    if (j === 'home'){ S.plans = {}; go('home'); return; }
+    if (j === 't3opts'){ S.t3item = S.plans.box ? 'plant' : 'box'; go('t3opts'); return; }
+    if (j === 't3confirm'){ S.t3opt = 'donate'; S.charityYes = false; S.t3pick = new Set(); S.backup = null; go('t3confirm'); return; }
+    if (j === 't3done'){ S.plans = {box:{label:'Donate, Mon 28 Sep'}, plant:{label:'Charity drop-off, Tue 29 Sep'}}; go('home'); return; }
+    return;
+  }
+  if (d.go){
+    if (d.go === 'capture' && !S.tagged.length) S.room = 'bedroom';
+    go(d.go); return;
+  }
+  if (d.tab){
+    if(d.tab==='home'||d.tab==='items') go(d.tab); else if(d.tab==='messages') go(S.task===2?'t2chat':'messages'); else snack('Profile is outside these tasks.');
+    return;
+  }
+  if(d.priceMode){S.priceModes[d.priceMode]=d.val;S.error='';stay();return;}
+  if(d.transport){S.transport[d.transport]=d.val;S.error='';stay();return;}
+  if(d.sampleDetails){const sample=SAMPLE_DETAILS[ITEMS[d.sampleDetails].art||d.sampleDetails];S.dimensions[d.sampleDetails]={l:sample.l,w:sample.w,h:sample.h};S.transport[d.sampleDetails]=sample.transport;S.error='';stay();return;}
+  if(d.editItem){S.expanded=d.editItem;go('organise');return;}
+  if(d.charityYes){S.charityYes=d.charityYes==='yes';S.error='';stay();return;}
+  if(d.filter){S.filter=d.filter;stay();return;}
+  if (d.soon){ snack(d.soon); return; }
+  if (d.tag){ toggleTag(d.tag); return; }
+  if (d.room){ S.room = d.room; S.error = ''; render(); return; }
+  if (d.sel){ S.selected.has(d.sel) ? S.selected.delete(d.sel) : S.selected.add(d.sel); S.error = ''; stay(); return; }
+  if (d.selall){
+    const ids = S.tagged.filter(id => ITEMS[id].room === d.selall), all = ids.every(id => S.selected.has(id));
+    ids.forEach(id => all ? S.selected.delete(id) : S.selected.add(id)); stay(); return;
+  }
+  if (d.condsheet){ S.sheet = 'cond:' + d.condsheet; stay(); return; }
+  if (d.pickcond){ S.cond[S.sheet.slice(5)] = d.pickcond; S.sheet = null; stay(); return; }
+  if (d.pickup){ S.pickup = d.pickup; S.where = {}; stay(); return; }
+  if (d.time){ S.times.has(d.time) ? S.times.delete(d.time) : S.times.add(d.time); S.error = ''; stay(); return; }
+  if (d.price){ S.price = d.price; stay(); return; }
+  if (d.expand){ S.expanded = S.expanded === d.expand ? null : d.expand; stay(); return; }
+  if (d.setcond){ S.cond[d.setcond] = d.val; stay(); return; }
+  if (d.where){ S.where[d.where] = d.val; stay(); return; }
+  if (d.sroom){ S.single.name = document.getElementById('single-name').value; S.single.room = d.sroom; stay(); return; }
+  if (d.scond){ S.single.name = document.getElementById('single-name').value; S.single.cond = d.scond; stay(); return; }
+  if (d.slot){ S.slot = d.slot; S.error = ''; stay(); return; }
+  if (d.place){ S.place = d.place; stay(); return; }
+  if (d.access){ S.access = d.access; S.error = ''; stay(); return; }
+  if (d.oday){ S.oday = d.oday; S.error = ''; stay(); return; }
+  if (d.otime){ S.otime = d.otime; S.error = ''; stay(); return; }
+  if (d.quick){ S.chat.push(['out', d.quick]); reply(d.quick.includes('Thursday') ? 'Thursday 6:30 works for me! Can you set it up in the app so we both have the details?' : 'Yes, with the legs removed. Can you set up the time and place in the app?', true); return; }
+  if (d.t3item){ S.t3item = d.t3item; go('t3opts'); return; }
+  if (d.opt){ S.t3opt = d.opt; S.t3pick = new Set(); S.charityYes=false; S.newPrice=S.changedPrices[S.t3item] ?? (S.t3item==='box'?'15':'10'); go('t3confirm'); return; }
+  if (d.pick){
+    if (OPTS[S.t3opt].multi){ S.t3pick.has(d.pick) ? S.t3pick.delete(d.pick) : S.t3pick.add(d.pick); }
+    else S.t3pick = new Set([d.pick]);
+    S.error = ''; stay(); return;
+  }
+  if (d.backup){ S.backup = d.backup; S.error = ''; stay(); return; }
+
+  switch (d.act){
+    case 'openAdd': S.sheet = 'add'; stay(); break;
+    case 'closeSheet': if (e.target === t) closeSheet(); break;
+    case 'startSnap': S.sheet = null; if (!S.tagged.length) S.room = 'bedroom'; go('capture'); break;
+    case 'newSingle': S.single = {photo:false, name:'', room:'bedroom', cond:'Good'}; go('single'); break;
+    case 'singlePhoto': S.single.name = document.getElementById('single-name').value; S.single.photo = true; stay(); break;
+    case 'addSingle': {
+      const name = document.getElementById('single-name').value.trim();
+      S.single.name = name;
+      if (!name){ S.error = 'Give the item a name.'; stay(); break; }
+      const id = 'c' + (++S.custom);
+      ITEMS[id] = {room:S.single.room, name:esc(name), cond:S.single.cond, art:guessArt(name)};
+      S.tagged.push(id); S.selected.add(id); S.cond[id] = S.single.cond;
+      go('organise'); snack(`${esc(name)} added.`);
+      break;
+    }
+    case 'shoot': S.shot[S.room] = true; render(); break;
+    case 'retake':
+      S.shot[S.room] = false;
+      S.tagged.filter(id => ITEMS[id].room === S.room && ITEMS[id].x).forEach(id => { S.tagged.splice(S.tagged.indexOf(id),1); S.selected.delete(id); });
+      render(); break;
+    case 'toOrganise':
+      if (!S.tagged.length){ S.error = S.shot[S.room] ? 'Tap at least one item in the photo.' : 'Take a photo first, then tap the items.'; render(); break; }
+      go('organise'); break;
+    case 'toDetails':
+      S.error=itemProblem();if(S.error){stay();break;}
+      go('details'); break;
+    case 'toReview':
+      if (!S.times.size){ S.error = 'Pick at least one time when people can collect.'; stay(); break; }
+      go('review'); break;
+    case 'publish': {
+      const problem=itemProblem();if(problem){go('organise');S.error=problem;stay();break;}
+      chosen().forEach(id=>{if(!S.listed.includes(id))S.listed.push(id);});
+      S.published = true; const n = chosen().length; S.tagged=[];S.selected.clear();S.shot={};go('home');snack(`${plural(n,'item')} listed in this prototype.`);
+      break;
+    }
+    case 'decline': snack('Declining is outside this task.'); break;
+    case 'otherTime': S.sheet = 'time'; S.error = ''; stay(); break;
+    case 'useOther':
+      if (!S.oday || !S.otime){ S.error = 'Pick a day and a time.'; stay(); break; }
+      S.customSlot = `${S.oday}, ${S.otime}`; S.slot = S.customSlot; S.sheet = null; S.error = ''; stay(); break;
+    case 'toggleHelp': S.help = !S.help; stay(); break;
+    case 'sendMsg': {
+      const inp = document.getElementById('chat-input'); const v = inp.value.trim();
+      if (!v) break;
+      S.chat.push(['out', v]); reply('Sounds good! Can you set up the time and place in the app so we both have it?', true);
+      break;
+    }
+    case 'sendPlan':
+      if (!S.slot){ S.error = 'Choose a time first.'; stay(); break; }
+      S.sent = true; S.confirmed = false; go('t2status');
+      clearTimeout(window.t2timer);
+      window.t2timer = setTimeout(() => { if (S.task === 2 && S.sent){ S.confirmed = true; S.chat.push(['in', `Confirmed, see you ${S.slot}!`]); snack('Taylor confirmed the handover.'); } }, 1800);
+      break;
+    case 'makeFree':S.newPrice='0';S.error='';stay();break;
+    case 'confirmPlan': {
+      const name=ITEMS[S.t3item].name;
+      if(S.t3opt==='price'){
+        if(!/^\d+(\.\d{1,2})?$/.test(S.newPrice)){S.error='Enter a valid price, or choose Offer it free.';stay();break;}
+        S.changedPrices[S.t3item]=S.newPrice;go('home');snack(`${name}: price updated. Still at risk.`);break;
+      }
+      if(!S.charityYes){S.error='Confirm that the charity has agreed to accept the item.';stay();break;}
+      if(!S.t3pick.size){S.error='Choose a drop-off day.';stay();break;}
+      S.plans[S.t3item]={label:`${DONATION_PLACE.name} · ${[...S.t3pick].join(', ')}`,location:DONATION_PLACE.address};
+      go('home');snack(`${name}: donation scheduled.`);break;
+    }
+  }
+});
+document.addEventListener('keydown', e => {
+  if(S.sheet==='t3opts'){
+    if(e.key==='Escape'){e.preventDefault();closeSheet();return;}
+    if(e.key==='Tab'){
+      const buttons=[...document.querySelectorAll('#screen [role="dialog"] button')];
+      const first=buttons[0],last=buttons[buttons.length-1];
+      if(e.shiftKey && document.activeElement===first){e.preventDefault();last.focus();}
+      else if(!e.shiftKey && document.activeElement===last){e.preventDefault();first.focus();}
+    }
+  }
+  const t = e.target;
+  if ((e.key === 'Enter' || e.key === ' ') && t.dataset && (t.dataset.tag || t.dataset.go) && t.tagName !== 'BUTTON'){
+    e.preventDefault(); t.click();
+  }
+  if (e.key === 'Enter' && t.id === 'chat-input') document.querySelector('[data-act="sendMsg"]').click();
+});
+document.addEventListener('input', e => {
+  const d=e.target.dataset;
+  if(d.priceinput)S.prices[d.priceinput]=e.target.value;
+  if(d.dimension){S.dimensions[d.dimension]??={};S.dimensions[d.dimension][d.axis]=e.target.value;}
+  if(e.target.id==='new-price')S.newPrice=e.target.value;
+  S.error='';const alert=document.querySelector('.err');if(alert)alert.textContent='';
+});
+document.addEventListener('change',e=>{if(e.target.id==='room-type'){S.room=e.target.value;S.error='';render();}});
+document.getElementById('restart').addEventListener('click', () => setTask(S.task, true));
+if (document.fonts) document.fonts.ready.then(() => render());
+setTask(1);
+
+</script>
+</body>
+</html>

@@ -13,6 +13,17 @@
 
 ---
 
+## Interactive MoveOut Prototype
+
+The research is accompanied by a browser-based prototype covering item listing, handover coordination and urgent redistribution before move-out.
+
+- **[Prototype HTML](prototype/moveout-prototype-m3-revised.html)** — download and open in a browser; no build step is needed.
+- **[Prototype README](prototype/README.md)** — setup, three task walkthroughs, interface controls and simulation boundaries.
+
+The latest revision includes consistent bottom-sheet actions, per-item price/size/transport details, and a charity drop-off map with clearly labelled example data.
+
+---
+
 ## 📖 Executive Summary
 
 During university move-out periods, vast quantities of functional, usable household goods (kitchenware, appliances, furniture) are discarded into landfills. While university assignments commonly rely on spreadsheets or descriptive summaries, **this project implements an end-to-end, reproducible Python data analysis and visualization pipeline** to uncover the behavioral drivers, channel barriers, and temporal dynamics behind student waste generation.
@@ -25,6 +36,7 @@ During university move-out periods, vast quantities of functional, usable househ
 ---
 
 ## 📑 Table of Contents
+- [Interactive MoveOut Prototype](#interactive-moveout-prototype)
 - [Executive Summary](#-executive-summary)
 - [Research Framework & Questions](#-research-framework--questions)
 - [Key Findings & Visual Insights](#-key-findings--visual-insights)
@@ -181,6 +193,9 @@ student-moveout-ux-research/
 ├── .gitignore                      # Git exclusion rules (protects school PDFs & virtual environments)
 ├── README.md                       # Comprehensive UX & BA case study (this document)
 ├── Survey_Analysis_Notes.md        # Complete 1,000-line detailed statistical & qualitative notes
+├── prototype/                     # Interactive HTML prototype and usage guide
+│   ├── README.md
+│   └── moveout-prototype-m3-revised.html
 ├── data/                           # Anonymized research datasets
 │   ├── survey.csv                  # Raw anonymized survey responses
 │   └── cleaned_survey.csv          # Filtered, preprocessed & UTF-8-SIG encoded dataset
